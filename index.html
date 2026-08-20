@@ -128,6 +128,9 @@
     padding:5px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:0.04em;
   }
   .tag-transito{background:var(--orange);color:var(--ink);}
+  .countdown{font-weight:600;}
+  .countdown.urgent{color:var(--orange);}
+  .card[data-sold-out] .tag-transito{background:var(--gray-light);}
   .tag-vendido{
     background:var(--ink);color:var(--paper);
     border:1px solid var(--orange);
@@ -281,42 +284,42 @@
       <p>Estos vehículos vienen en camino desde Estados Unidos. Se ofrecen por orden de llegada — el que se vende primero, se retira del camino.</p>
     </div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-arrival="2026-09-01">
         <div class="card-media">
           <img src="images/mazda3-3.jpg" alt="Mazda 3 2013 plateado, en ruta hacia Guatemala">
           <span class="tag tag-transito">En tránsito</span>
         </div>
         <div class="card-body">
           <h3>Mazda 3 2013</h3>
-          <div class="card-meta"><span>ETA 12 días</span><span>·</span><span>Daño frontal</span></div>
+          <div class="card-meta"><span class="countdown">·</span><span>·</span><span>Daño frontal</span></div>
           <div class="card-price">
             <span class="price">$4,200</span>
             <span class="card-cta">Reservar →</span>
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" data-arrival="2026-08-29">
         <div class="card-media">
           <img src="images/elantra-1.jpg" alt="Hyundai Elantra 2016 negro, en ruta hacia Guatemala">
           <span class="tag tag-transito">En tránsito</span>
         </div>
         <div class="card-body">
           <h3>Hyundai Elantra 2016</h3>
-          <div class="card-meta"><span>ETA 9 días</span><span>·</span><span>Daño frontal</span></div>
+          <div class="card-meta"><span class="countdown">·</span><span>·</span><span>Daño frontal</span></div>
           <div class="card-price">
             <span class="price">$3,600</span>
             <span class="card-cta">Reservar →</span>
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" data-arrival="2026-09-04">
         <div class="card-media">
           <img src="images/speed3-1.jpg" alt="Mazdaspeed 3 rojo, en ruta hacia Guatemala">
           <span class="tag tag-transito">En tránsito</span>
         </div>
         <div class="card-body">
           <h3>Mazdaspeed 3 2012</h3>
-          <div class="card-meta"><span>ETA 15 días</span><span>·</span><span>Daño frontal</span></div>
+          <div class="card-meta"><span class="countdown">·</span><span>·</span><span>Daño frontal</span></div>
           <div class="card-price">
             <span class="price">$6,800</span>
             <span class="card-cta">Reservar →</span>
@@ -435,5 +438,39 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  function updateCountdowns(){
+    var cards = document.querySelectorAll('.card[data-arrival]');
+    var now = new Date();
+    now.setHours(0,0,0,0);
+    cards.forEach(function(card){
+      var arrival = new Date(card.getAttribute('data-arrival') + 'T00:00:00');
+      var msPerDay = 24 * 60 * 60 * 1000;
+      var daysLeft = Math.round((arrival - now) / msPerDay);
+      var el = card.querySelector('.countdown');
+      if(!el) return;
+      el.classList.remove('urgent');
+      if(daysLeft > 1){
+        el.textContent = 'Llega en ' + daysLeft + ' días';
+      } else if(daysLeft === 1){
+        el.textContent = 'Llega mañana';
+        el.classList.add('urgent');
+      } else if(daysLeft === 0){
+        el.textContent = 'Llega hoy';
+        el.classList.add('urgent');
+      } else {
+        el.textContent = 'Ya en Guatemala';
+        el.classList.add('urgent');
+      }
+      if(daysLeft <= 3){
+        el.classList.add('urgent');
+      }
+    });
+  }
+  updateCountdowns();
+  setInterval(updateCountdowns, 60 * 60 * 1000);
+})();
+</script>
 </body>
 </html>
