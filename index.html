@@ -122,6 +122,21 @@
   .listings.alt .card{background:#1a1a1a;border-color:#2c2c2a;}
   .card-media{aspect-ratio:4/3;overflow:hidden;position:relative;background:#eee;}
   .card-media img{width:100%;height:100%;object-fit:cover;}
+  .gallery-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:28px;height:28px;border-radius:50%;border:none;
+    background:rgba(17,17,17,0.55);color:#fff;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;z-index:2;
+  }
+  .gallery-arrow:hover{background:var(--orange);color:var(--ink);}
+  .gallery-arrow.prev{left:8px;}
+  .gallery-arrow.next{right:8px;}
+  .gallery-dots{
+    position:absolute;bottom:10px;left:0;right:0;
+    display:flex;justify-content:center;gap:5px;z-index:2;
+  }
+  .gallery-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.5);}
+  .gallery-dots span.active{background:var(--orange);width:14px;border-radius:3px;}
   .tag{
     position:absolute;top:12px;left:12px;
     font-family:'Roboto Mono',monospace;font-size:11px;
@@ -355,7 +370,7 @@
 
 <script>
   // Set this once to your deployed Worker URL (same as in admin.html)
-  const API_BASE = "https://autoremate-api.jonagar90.workers.dev";
+  const API_BASE = "https://autoremate-api.YOUR-SUBDOMAIN.workers.dev";
 
   function daysLeftText(arrival){
     const now = new Date(); now.setHours(0,0,0,0);
@@ -367,13 +382,41 @@
     return { text: "Ya en Guatemala", urgent: true };
   }
 
+  function galleryHTML(images, cardId){
+    const imgs = (images && images.length ? images : [""]).map(k => k ? `${API_BASE}/${k}` : "");
+    const first = imgs[0] || "";
+    if(imgs.length <= 1){
+      return `<img class="gallery-img" id="img-${cardId}" src="${first}" alt="">`;
+    }
+    const dots = imgs.map((_, i) => `<span class="${i === 0 ? 'active' : ''}"></span>`).join("");
+    return `
+      <img class="gallery-img" id="img-${cardId}" src="${first}" alt="" data-images='${JSON.stringify(imgs)}' data-index="0">
+      <button type="button" class="gallery-arrow prev" onclick="cycleGallery('${cardId}', -1, event)">‹</button>
+      <button type="button" class="gallery-arrow next" onclick="cycleGallery('${cardId}', 1, event)">›</button>
+      <div class="gallery-dots" id="dots-${cardId}">${dots}</div>`;
+  }
+
+  function cycleGallery(cardId, dir, evt){
+    if(evt) evt.stopPropagation();
+    const img = document.getElementById(`img-${cardId}`);
+    if(!img) return;
+    const imgs = JSON.parse(img.getAttribute('data-images') || '[]');
+    let idx = parseInt(img.getAttribute('data-index') || '0', 10);
+    idx = (idx + dir + imgs.length) % imgs.length;
+    img.src = imgs[idx];
+    img.setAttribute('data-index', idx);
+    const dotsEl = document.getElementById(`dots-${cardId}`);
+    if(dotsEl){
+      Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  }
+
   function ventaCardHTML(car){
-    const img = car.image ? `${API_BASE}/${car.image}` : "";
     const dl = car.arrival ? daysLeftText(car.arrival) : { text: "En ruta", urgent: false };
     return `
       <div class="card">
         <div class="card-media">
-          <img src="${img}" alt="${car.title}, en ruta hacia Guatemala">
+          ${galleryHTML(car.images, car.id)}
           <span class="tag tag-transito">En tránsito</span>
         </div>
         <div class="card-body">
@@ -388,11 +431,10 @@
   }
 
   function vendidoCardHTML(car){
-    const img = car.image ? `${API_BASE}/${car.image}` : "";
     return `
       <div class="card">
         <div class="card-media">
-          <img src="${img}" alt="${car.title} vendido">
+          ${galleryHTML(car.images, car.id)}
           <span class="tag tag-vendido">Vendido</span>
           <div class="stamp"><span>Vendido</span></div>
         </div>
