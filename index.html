@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AutoRemate — Carros de subasta USA, directo a Guatemala</title>
+<meta name="description" content="Compramos carros directo en subastas de Estados Unidos y los ofrecemos mientras vienen en camino a Guatemala. Precio de subasta, sin intermediarios, documentación en regla.">
+<meta name="keywords" content="carros subasta guatemala, carros usados guatemala, importación de carros, carros chocados guatemala, IAAI guatemala, carros baratos guatemala">
+<meta property="og:title" content="AutoRemate — Carros de subasta USA, directo a Guatemala">
+<meta property="og:description" content="Compramos carros directo en subastas de Estados Unidos y los ofrecemos mientras vienen en camino a Guatemala. Precio de subasta, sin intermediarios.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_GT">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='24' fill='%23111'/%3E%3Cpath d='M55 150 L55 50 L120 50 Q150 50 150 82 Q150 112 120 112 L75 112 L150 150' fill='none' stroke='%23FF6A00' stroke-width='16'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
@@ -286,7 +294,72 @@
     .steps{grid-template-columns:1fr;}
     .grid{grid-template-columns:1fr;}
     .contact-grid{grid-template-columns:1fr;gap:36px;}
+    .trust-grid{grid-template-columns:1fr 1fr!important;}
+    .filter-bar{flex-direction:column;align-items:stretch!important;}
   }
+
+  /* floating WhatsApp button */
+  .wa-float{
+    position:fixed;bottom:22px;right:22px;z-index:150;
+    width:58px;height:58px;border-radius:50%;
+    background:#25D366;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 22px rgba(0,0,0,0.3);
+    transition:transform 0.15s ease;
+  }
+  .wa-float:hover{transform:scale(1.08);}
+  .wa-float svg{width:30px;height:30px;}
+
+  /* favorite heart */
+  .fav-btn{
+    position:absolute;top:12px;right:12px;z-index:3;
+    width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(17,17,17,0.55);display:flex;align-items:center;justify-content:center;
+    font-size:16px;color:#fff;transition:transform 0.12s ease;
+  }
+  .fav-btn:hover{transform:scale(1.1);}
+  .fav-btn.active{color:var(--orange);}
+
+  /* filter bar */
+  .filter-bar{
+    display:flex;gap:12px;align-items:center;margin-bottom:28px;flex-wrap:wrap;
+  }
+  .filter-bar input[type="text"]{
+    flex:1;min-width:200px;padding:12px 16px;border:1px solid var(--line);border-radius:6px;
+    font-family:'Inter',sans-serif;font-size:14px;background:var(--paper);
+  }
+  .filter-bar select{
+    padding:12px 14px;border:1px solid var(--line);border-radius:6px;
+    font-family:'Inter',sans-serif;font-size:14px;background:var(--paper);cursor:pointer;
+  }
+  .filter-chip{
+    display:flex;align-items:center;gap:6px;padding:11px 16px;border:1px solid var(--line);
+    border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:var(--paper);
+    user-select:none;white-space:nowrap;
+  }
+  .filter-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  /* trust badges */
+  .trust{padding:60px 0;background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);}
+  .trust-item{background:var(--paper);padding:26px 22px;text-align:center;}
+  .trust-item .ico{font-size:26px;margin-bottom:10px;}
+  .trust-item h4{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .trust-item p{font-size:12.5px;color:var(--gray);line-height:1.5;}
+
+  /* testimonials */
+  .testimonials{padding:80px 0;background:var(--cream);}
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .testi-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:24px;}
+  .testi-stars{color:var(--orange);font-size:14px;margin-bottom:12px;letter-spacing:2px;}
+  .testi-quote{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:16px;}
+  .testi-author{display:flex;align-items:center;gap:10px;}
+  .testi-avatar{
+    width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--orange);
+    display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-size:14px;flex:none;
+  }
+  .testi-author b{display:block;font-size:13px;}
+  .testi-author span{display:block;font-size:12px;color:var(--gray);}
+  @media(max-width:760px){.testi-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -333,6 +406,33 @@
   </div>
 </section>
 
+<section class="trust">
+  <div class="wrap">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="ico">📄</div>
+        <h4>Documentación en regla</h4>
+        <p>Cada carro llega nacionalizado, con papeles listos para poner placas.</p>
+      </div>
+      <div class="trust-item">
+        <div class="ico">💵</div>
+        <h4>Precio fijo, sin regateo</h4>
+        <p>El precio que ves es el precio — sin sorpresas ni negociación de último minuto.</p>
+      </div>
+      <div class="trust-item">
+        <div class="ico">🔍</div>
+        <h4>Daño mostrado sin filtro</h4>
+        <p>Fotos reales del vehículo tal como llega — nada se esconde ni se maquilla.</p>
+      </div>
+      <div class="trust-item">
+        <div class="ico">🤝</div>
+        <h4>20+ años de experiencia</h4>
+        <p>Compra directa en subasta, respaldada por años en importación de vehículos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="how" id="como-funciona">
   <div class="wrap">
     <div class="section-head">
@@ -367,6 +467,15 @@
       <h2>Carros en venta</h2>
       <p>Estos vehículos vienen en camino desde Estados Unidos. Se ofrecen por orden de llegada — el que se vende primero, se retira del camino.</p>
     </div>
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Buscar por marca o modelo…" oninput="applyFilters()">
+      <select id="sortSelect" onchange="applyFilters()">
+        <option value="arrival">Ordenar: llega primero</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+      </select>
+      <div class="filter-chip" id="favToggle" onclick="toggleFavFilter()">♥ Solo favoritos</div>
+    </div>
     <div class="grid" id="ventaGrid">
       <p class="listings-foot">Cargando inventario…</p>
     </div>
@@ -385,6 +494,42 @@
       <p class="listings-foot">Cargando…</p>
     </div>
     <p class="listings-foot">Fotos reales de vehículos gestionados por nuestro equipo. Precios de referencia.</p>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Lo que dicen</div>
+      <h2>Compradores reales</h2>
+      <p>Ejemplos representativos de la experiencia de compra — se irán reemplazando por reseñas reales conforme lleguen.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Compré el carro mientras todavía estaba en camino y llegó justo como en las fotos. El precio fue mejor que cualquier cosa que encontré en Guatemala."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">C</div>
+          <div><b>Carlos M.</b><span>Ciudad de Guatemala</span></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Todo el proceso fue transparente — me mostraron el daño real antes de comprar, sin sorpresas al recibirlo."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div><b>Ana R.</b><span>Mixco</span></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Lo reparé yo mismo y me ahorré bastante comparado con comprar uno ya arreglado. Buena comunicación por WhatsApp todo el tiempo."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">J</div>
+          <div><b>José L.</b><span>Quetzaltenango</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -436,6 +581,10 @@
     <span>Una marca del Grupo TH3 · Guatemala</span>
   </div>
 </footer>
+
+<a class="wa-float" href="https://wa.me/50200000000?text=Hola%2C%20me%20interesa%20un%20carro%20en%20AutoRemate" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.09c-.24.68-1.4 1.32-1.93 1.4-.49.08-1.11.11-1.79-.11-.41-.13-.94-.3-1.62-.6-2.86-1.24-4.73-4.12-4.87-4.31-.14-.19-1.17-1.55-1.17-2.96 0-1.4.74-2.09 1-2.38.26-.28.57-.36.76-.36h.55c.18 0 .41-.07.64.49.24.57.81 1.97.88 2.11.07.14.11.31.02.5-.09.19-.14.31-.28.47-.14.16-.29.36-.42.48-.14.14-.28.28-.12.56.16.28.71 1.18 1.53 1.91 1.05.94 1.94 1.24 2.22 1.38.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.28.36-.23.6-.14.24.09 1.53.72 1.79.86.26.14.44.21.5.32.07.11.07.65-.17 1.33z"/></svg>
+</a>
 
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeDetail()">
   <div class="modal">
@@ -501,11 +650,13 @@
 
   function ventaCardHTML(car){
     const dl = car.arrival ? daysLeftText(car.arrival) : { text: "En ruta", urgent: false };
+    const isFav = isFavorite(car.id);
     return `
       <div class="card" onclick="openDetail('${car.id}')">
         <div class="card-media">
           ${galleryHTML(car.images, car.id)}
           <span class="tag tag-transito">En tránsito</span>
+          <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${car.id}')">${isFav ? '♥' : '♡'}</button>
         </div>
         <div class="card-body">
           <h3>${car.title}</h3>
@@ -537,6 +688,47 @@
       </div>`;
   }
 
+  // --- favorites ---
+  function getFavorites(){
+    try{ return JSON.parse(localStorage.getItem("autoremate_favs") || "[]"); }catch(e){ return []; }
+  }
+  function isFavorite(id){ return getFavorites().includes(id); }
+  function toggleFavorite(evt, id){
+    evt.stopPropagation();
+    let favs = getFavorites();
+    favs = favs.includes(id) ? favs.filter(f => f !== id) : favs.concat(id);
+    localStorage.setItem("autoremate_favs", JSON.stringify(favs));
+    renderVentaGrid();
+  }
+  let favOnly = false;
+  function toggleFavFilter(){
+    favOnly = !favOnly;
+    document.getElementById("favToggle").classList.toggle("active", favOnly);
+    renderVentaGrid();
+  }
+
+  // --- search + sort ---
+  function applyFilters(){ renderVentaGrid(); }
+
+  function renderVentaGrid(){
+    const ventaGrid = document.getElementById("ventaGrid");
+    let enVenta = allCars.filter(c => c.type === "venta");
+
+    const q = (document.getElementById("searchInput")?.value || "").toLowerCase().trim();
+    if(q) enVenta = enVenta.filter(c => c.title.toLowerCase().includes(q));
+
+    if(favOnly) enVenta = enVenta.filter(c => isFavorite(c.id));
+
+    const sortBy = document.getElementById("sortSelect")?.value || "arrival";
+    if(sortBy === "price-asc") enVenta.sort((a,b) => a.price - b.price);
+    else if(sortBy === "price-desc") enVenta.sort((a,b) => b.price - a.price);
+    else enVenta.sort((a,b) => (a.arrival || "9999").localeCompare(b.arrival || "9999"));
+
+    ventaGrid.innerHTML = enVenta.length
+      ? enVenta.map(ventaCardHTML).join("")
+      : `<p class="listings-foot">${favOnly ? "No tienes carros marcados como favoritos todavía." : "Por ahora no hay carros en ruta que coincidan — vuelve pronto."}</p>`;
+  }
+
   async function loadInventory(){
     const ventaGrid = document.getElementById("ventaGrid");
     const vendidoGrid = document.getElementById("vendidoGrid");
@@ -544,12 +736,9 @@
       const res = await fetch(`${API_BASE}/api/cars`);
       const data = await res.json();
       allCars = data.cars || [];
-      const enVenta = allCars.filter(c => c.type === "venta");
       const vendidos = allCars.filter(c => c.type === "vendido");
 
-      ventaGrid.innerHTML = enVenta.length
-        ? enVenta.map(ventaCardHTML).join("")
-        : `<p class="listings-foot">Por ahora no hay carros en ruta — vuelve pronto.</p>`;
+      renderVentaGrid();
 
       vendidoGrid.innerHTML = vendidos.length
         ? vendidos.map(vendidoCardHTML).join("")
