@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoRemate — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111111; --paper:#FFFFFF; --cream:#F1EFE8;
+    --orange:#FF6A00; --gray:#5F5E5A; --gray-light:#D3D1C7; --line:#E4E1D6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 16px 80px;}
+  h1{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;}
+  h1 span{color:var(--orange);}
+  .sub{color:var(--gray);font-size:14px;margin:6px 0 28px;}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:24px;margin-bottom:20px;}
+  .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:16px;color:var(--gray);}
+  .field{margin-bottom:14px;}
+  label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.03em;color:var(--gray);margin-bottom:5px;}
+  input,select{
+    width:100%;border:1px solid var(--gray-light);border-radius:4px;
+    padding:11px 12px;font-family:'Inter',sans-serif;font-size:14px;background:var(--paper);
+  }
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .btn{
+    display:inline-block;padding:13px 22px;border:none;border-radius:4px;
+    font-size:14px;font-weight:700;text-transform:uppercase;cursor:pointer;
+  }
+  .btn-primary{background:var(--orange);color:var(--ink);}
+  .btn-primary:hover{background:var(--ink);color:var(--paper);}
+  .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+  .btn-danger{background:transparent;color:#B23A2E;border:1px solid #B23A2E;padding:8px 14px;font-size:12px;}
+  .btn-danger:hover{background:#B23A2E;color:var(--paper);}
+  .btn-sell{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:8px 14px;font-size:12px;}
+  .btn-sell:hover{background:var(--ink);color:var(--paper);}
+  .type-toggle{display:flex;gap:10px;margin-bottom:18px;}
+  .type-toggle button{
+    flex:1;padding:11px;border:1px solid var(--gray-light);border-radius:4px;background:var(--paper);
+    font-size:13px;font-weight:600;text-transform:uppercase;cursor:pointer;
+  }
+  .type-toggle button.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .msg{font-size:13px;padding:10px 12px;border-radius:4px;margin-bottom:14px;}
+  .msg.error{background:#FBE7E3;color:#B23A2E;}
+  .msg.success{background:#E8F3E5;color:#2E6B2A;}
+  .login-box{max-width:340px;margin:80px auto 0;}
+  .car-item{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:6px;margin-bottom:10px;}
+  .car-item img{width:64px;height:48px;object-fit:cover;border-radius:4px;flex:none;background:#eee;}
+  .car-item .info{flex:1;min-width:0;}
+  .car-item .info b{display:block;font-size:14px;}
+  .car-item .info span{display:block;font-size:12px;color:var(--gray);font-family:'Roboto Mono',monospace;}
+  .car-item .actions{display:flex;gap:8px;flex:none;}
+  .pill{font-size:10px;text-transform:uppercase;padding:3px 8px;border-radius:10px;font-weight:700;}
+  .pill.venta{background:var(--orange);color:var(--ink);}
+  .pill.vendido{background:var(--ink);color:var(--paper);}
+  .file-drop{
+    border:2px dashed var(--gray-light);border-radius:6px;padding:20px;text-align:center;
+    cursor:pointer;font-size:13px;color:var(--gray);
+  }
+  .file-drop.has-file{border-color:var(--orange);color:var(--ink);}
+  #preview{max-width:120px;border-radius:4px;margin-top:10px;display:none;}
+  .logout{float:right;font-size:12px;color:var(--gray);cursor:pointer;text-decoration:underline;}
+  .config-note{font-size:12px;color:var(--gray);margin-top:-14px;margin-bottom:22px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Auto<span>Remate</span> — Admin</h1>
+  <p class="sub">Agrega, marca como vendido, o elimina carros directamente desde aquí. Se refleja en la página automáticamente.</p>
+
+  <!-- LOGIN -->
+  <div class="panel login-box" id="loginPanel">
+    <h2>Iniciar sesión</h2>
+    <div id="loginMsg"></div>
+    <div class="field">
+      <label>Contraseña de administrador</label>
+      <input id="password" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="login()">Entrar</button>
+  </div>
+
+  <!-- ADMIN CONTENT -->
+  <div id="adminContent" style="display:none">
+    <span class="logout" onclick="logout()">Cerrar sesión</span>
+
+    <div class="panel">
+      <h2>Agregar carro</h2>
+      <div id="formMsg"></div>
+      <div class="type-toggle">
+        <button type="button" class="active" data-type="venta" onclick="setType('venta')">En venta (en tránsito)</button>
+        <button type="button" data-type="vendido" onclick="setType('vendido')">Vendido</button>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Marca y modelo</label>
+          <input id="title" placeholder="Ej: Toyota Corolla 2015">
+        </div>
+        <div class="field">
+          <label>Precio (USD)</label>
+          <input id="price" placeholder="Ej: 4500">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field" id="arrivalField">
+          <label>Fecha de llegada</label>
+          <input id="arrival" type="date">
+        </div>
+        <div class="field" id="stockField" style="display:none">
+          <label>Número de stock / lote</label>
+          <input id="stock" placeholder="Ej: 19631860">
+        </div>
+        <div class="field" id="damageField">
+          <label>Descripción del daño</label>
+          <input id="damage" placeholder="Ej: Daño frontal">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Foto del vehículo</label>
+        <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+          Toca aquí para elegir o tomar una foto
+        </div>
+        <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="onFileChosen(this)">
+        <img id="preview">
+      </div>
+
+      <button class="btn btn-primary" id="submitBtn" onclick="submitCar()">Agregar a la página</button>
+    </div>
+
+    <div class="panel">
+      <h2>Carros actuales</h2>
+      <div id="carList">Cargando…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set this once to your deployed Worker URL, e.g. https://autoremate-api.yoursubdomain.workers.dev
+  const API_BASE = "https://autoremate-api.YOUR-SUBDOMAIN.workers.dev";
+
+  let token = localStorage.getItem("autoremate_admin_token") || "";
+  let currentType = "venta";
+  let uploadedImageKey = "";
+
+  function showMsg(elId, text, type){
+    document.getElementById(elId).innerHTML = `<div class="msg ${type}">${text}</div>`;
+  }
+  function clearMsg(elId){ document.getElementById(elId).innerHTML = ""; }
+
+  async function login(){
+    const password = document.getElementById("password").value;
+    if(!password){ showMsg("loginMsg","Escribe la contraseña","error"); return; }
+    try{
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if(data.ok){
+        token = data.token;
+        localStorage.setItem("autoremate_admin_token", token);
+        showAdmin();
+      } else {
+        showMsg("loginMsg", data.error || "Contraseña incorrecta", "error");
+      }
+    } catch(e){
+      showMsg("loginMsg", "No se pudo conectar al servidor. Revisa API_BASE en el código.", "error");
+    }
+  }
+
+  function logout(){
+    token = "";
+    localStorage.removeItem("autoremate_admin_token");
+    document.getElementById("loginPanel").style.display = "block";
+    document.getElementById("adminContent").style.display = "none";
+  }
+
+  function showAdmin(){
+    document.getElementById("loginPanel").style.display = "none";
+    document.getElementById("adminContent").style.display = "block";
+    loadCars();
+  }
+
+  function setType(type){
+    currentType = type;
+    document.querySelectorAll(".type-toggle button").forEach(b => b.classList.toggle("active", b.dataset.type === type));
+    document.getElementById("arrivalField").style.display = type === "venta" ? "block" : "none";
+    document.getElementById("stockField").style.display = type === "vendido" ? "block" : "none";
+  }
+
+  function onFileChosen(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById("preview").src = e.target.result;
+      document.getElementById("preview").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+    document.getElementById("fileDrop").classList.add("has-file");
+    document.getElementById("fileDrop").textContent = file.name;
+  }
+
+  async function submitCar(){
+    clearMsg("formMsg");
+    const title = document.getElementById("title").value.trim();
+    const price = document.getElementById("price").value.trim();
+    const fileInput = document.getElementById("fileInput");
+
+    if(!title || !price){
+      showMsg("formMsg", "Completa al menos marca/modelo y precio.", "error");
+      return;
+    }
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Subiendo…";
+
+    try{
+      let imageKey = "";
+      if(fileInput.files[0]){
+        const form = new FormData();
+        form.append("file", fileInput.files[0]);
+        const upRes = await fetch(`${API_BASE}/api/upload`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` },
+          body: form
+        });
+        const upData = await upRes.json();
+        if(!upData.ok){ throw new Error(upData.error || "Error al subir la foto"); }
+        imageKey = upData.key;
+      }
+
+      const payload = {
+        type: currentType,
+        title,
+        price,
+        image: imageKey,
+        damage: document.getElementById("damage").value.trim(),
+        arrival: document.getElementById("arrival").value,
+        stock: document.getElementById("stock").value.trim(),
+      };
+
+      const res = await fetch(`${API_BASE}/api/cars`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(!data.ok) throw new Error(data.error || "Error al guardar");
+
+      showMsg("formMsg", "Carro agregado — ya está visible en la página.", "success");
+      document.getElementById("title").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("damage").value = "";
+      document.getElementById("stock").value = "";
+      document.getElementById("arrival").value = "";
+      fileInput.value = "";
+      document.getElementById("preview").style.display = "none";
+      document.getElementById("fileDrop").textContent = "Toca aquí para elegir o tomar una foto";
+      document.getElementById("fileDrop").classList.remove("has-file");
+      loadCars();
+    } catch(err){
+      showMsg("formMsg", err.message, "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Agregar a la página";
+    }
+  }
+
+  async function loadCars(){
+    const listEl = document.getElementById("carList");
+    listEl.textContent = "Cargando…";
+    try{
+      const res = await fetch(`${API_BASE}/api/cars`);
+      const data = await res.json();
+      if(!data.cars || data.cars.length === 0){
+        listEl.textContent = "Todavía no hay carros agregados.";
+        return;
+      }
+      listEl.innerHTML = data.cars.map(car => `
+        <div class="car-item">
+          <img src="${car.image ? API_BASE + '/' + car.image : ''}" onerror="this.style.opacity=0">
+          <div class="info">
+            <b>${car.title} <span class="pill ${car.type}">${car.type === 'venta' ? 'En venta' : 'Vendido'}</span></b>
+            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.type === 'vendido' && car.stock ? '· stock ' + car.stock : ''}</span>
+          </div>
+          <div class="actions">
+            ${car.type === 'venta' ? `<button class="btn-sell" onclick="markSold('${car.id}')">Marcar vendido</button>` : ''}
+            <button class="btn-danger" onclick="deleteCar('${car.id}')">Eliminar</button>
+          </div>
+        </div>
+      `).join("");
+    } catch(e){
+      listEl.textContent = "No se pudo cargar la lista.";
+    }
+  }
+
+  async function markSold(id){
+    await fetch(`${API_BASE}/api/cars/${id}/sell`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    loadCars();
+  }
+
+  async function deleteCar(id){
+    if(!confirm("¿Eliminar este carro de la página?")) return;
+    await fetch(`${API_BASE}/api/cars/${id}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    loadCars();
+  }
+
+  // auto-login if token saved
+  if(token){ showAdmin(); }
+</script>
+</body>
+</html>
