@@ -73,12 +73,13 @@ export default {
       const body = await request.json().catch(() => null);
       if (!body || !body.title) return json({ error: "Datos incompletos" }, env, 400);
       const cars = await getCars(env);
+      const images = Array.isArray(body.images) ? body.images.slice(0, 10) : (body.image ? [body.image] : []);
       const car = {
         id: uid(),
         type: body.type === "vendido" ? "vendido" : "venta",
         title: body.title,
         price: Number(body.price) || 0,
-        image: body.image || "",
+        images,
         damage: body.damage || "",
         arrival: body.arrival || "",
         stock: body.stock || "",
