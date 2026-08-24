@@ -118,6 +118,75 @@
   .card{
     border:1px solid var(--line);border-radius:6px;overflow:hidden;
     background:var(--paper);position:relative;
+    cursor:pointer;transition:transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(17,17,17,0.10);}
+  .listings.alt .card:hover{box-shadow:0 14px 32px rgba(0,0,0,0.35);}
+
+  /* detail modal */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:200;
+    background:rgba(17,17,17,0.72);backdrop-filter:blur(3px);
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper);border-radius:10px;overflow:hidden;
+    width:100%;max-width:980px;max-height:92vh;
+    display:grid;grid-template-columns:1.3fr 1fr;
+    box-shadow:0 30px 80px rgba(0,0,0,0.4);
+  }
+  .modal-close{
+    position:absolute;top:16px;right:16px;z-index:5;
+    width:36px;height:36px;border-radius:50%;border:none;
+    background:rgba(17,17,17,0.6);color:#fff;font-size:18px;cursor:pointer;
+  }
+  .modal-close:hover{background:var(--orange);color:var(--ink);}
+  .modal-media{position:relative;background:#0d0d0d;display:flex;flex-direction:column;}
+  .modal-main-img-wrap{position:relative;flex:1;min-height:320px;background:#0d0d0d;}
+  .modal-main-img-wrap img{width:100%;height:100%;object-fit:contain;position:absolute;inset:0;}
+  .modal-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:38px;height:38px;border-radius:50%;border:none;
+    background:rgba(255,255,255,0.12);color:#fff;font-size:18px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;z-index:2;
+  }
+  .modal-arrow:hover{background:var(--orange);color:var(--ink);}
+  .modal-arrow.prev{left:14px;}
+  .modal-arrow.next{right:14px;}
+  .modal-counter{
+    position:absolute;bottom:12px;left:14px;z-index:2;
+    background:rgba(17,17,17,0.65);color:#fff;font-family:'Roboto Mono',monospace;
+    font-size:12px;padding:4px 10px;border-radius:12px;
+  }
+  .modal-thumbs{display:flex;gap:6px;padding:10px;background:#151513;overflow-x:auto;}
+  .modal-thumbs img{
+    width:56px;height:44px;object-fit:cover;border-radius:4px;flex:none;cursor:pointer;
+    opacity:0.5;border:2px solid transparent;
+  }
+  .modal-thumbs img.active{opacity:1;border-color:var(--orange);}
+  .modal-details{padding:28px;overflow-y:auto;}
+  .modal-details .tag{position:static;display:inline-block;margin-bottom:14px;}
+  .modal-details h2{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:4px;}
+  .modal-price-row{display:flex;align-items:baseline;gap:10px;margin:10px 0 20px;}
+  .modal-price{font-family:'Archivo Black',sans-serif;font-size:30px;}
+  .modal-price-sold{font-family:'Archivo Black',sans-serif;font-size:26px;color:var(--gray);text-decoration:line-through;}
+  .modal-specs{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-bottom:24px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .modal-spec b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray);margin-bottom:3px;}
+  .modal-spec span{font-size:14px;font-weight:600;}
+  .modal-countdown-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--cream);border:1px solid var(--line);border-radius:20px;
+    padding:6px 14px;font-size:13px;font-weight:600;margin-bottom:20px;
+  }
+  .modal-countdown-badge.urgent{background:#FFF1E6;border-color:var(--orange);color:var(--orange-dark);}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .modal-actions .btn{justify-content:center;width:100%;}
+  .modal-note{font-size:12px;color:var(--gray);margin-top:16px;line-height:1.5;}
+
+  @media(max-width:760px){
+    .modal{grid-template-columns:1fr;overflow-y:auto;}
+    .modal-main-img-wrap{min-height:260px;}
   }
   .listings.alt .card{background:#1a1a1a;border-color:#2c2c2a;}
   .card-media{aspect-ratio:4/3;overflow:hidden;position:relative;background:#eee;}
@@ -368,9 +437,28 @@
   </div>
 </footer>
 
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeDetail()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <div class="modal-media">
+      <div class="modal-main-img-wrap">
+        <img id="modalMainImg" src="" alt="">
+        <button class="modal-arrow prev" id="modalPrev" onclick="modalCycle(-1)">‹</button>
+        <button class="modal-arrow next" id="modalNext" onclick="modalCycle(1)">›</button>
+        <span class="modal-counter" id="modalCounter"></span>
+      </div>
+      <div class="modal-thumbs" id="modalThumbs"></div>
+    </div>
+    <div class="modal-details" id="modalDetails"></div>
+  </div>
+</div>
+
 <script>
   // Set this once to your deployed Worker URL (same as in admin.html)
   const API_BASE = "https://autoremate-api.jonagar90.workers.dev";
+  let allCars = [];
+  let modalImgs = [];
+  let modalIdx = 0;
 
   function daysLeftText(arrival){
     const now = new Date(); now.setHours(0,0,0,0);
@@ -414,7 +502,7 @@
   function ventaCardHTML(car){
     const dl = car.arrival ? daysLeftText(car.arrival) : { text: "En ruta", urgent: false };
     return `
-      <div class="card">
+      <div class="card" onclick="openDetail('${car.id}')">
         <div class="card-media">
           ${galleryHTML(car.images, car.id)}
           <span class="tag tag-transito">En tránsito</span>
@@ -424,7 +512,7 @@
           <div class="card-meta"><span class="${dl.urgent ? 'countdown urgent' : 'countdown'}">${dl.text}</span><span>·</span><span>${car.damage || ''}</span></div>
           <div class="card-price">
             <span class="price">$${Number(car.price).toLocaleString('en-US')}</span>
-            <span class="card-cta">Reservar →</span>
+            <span class="card-cta">Ver detalles →</span>
           </div>
         </div>
       </div>`;
@@ -432,7 +520,7 @@
 
   function vendidoCardHTML(car){
     return `
-      <div class="card">
+      <div class="card" onclick="openDetail('${car.id}')">
         <div class="card-media">
           ${galleryHTML(car.images, car.id)}
           <span class="tag tag-vendido">Vendido</span>
@@ -443,7 +531,7 @@
           <div class="card-meta"><span>${car.stock ? 'Stock ' + car.stock : ''}</span></div>
           <div class="card-price">
             <span class="price-sold">$${Number(car.price).toLocaleString('en-US')}</span>
-            <span class="card-cta">Vendido en ruta</span>
+            <span class="card-cta">Ver detalles →</span>
           </div>
         </div>
       </div>`;
@@ -455,9 +543,9 @@
     try{
       const res = await fetch(`${API_BASE}/api/cars`);
       const data = await res.json();
-      const cars = data.cars || [];
-      const enVenta = cars.filter(c => c.type === "venta");
-      const vendidos = cars.filter(c => c.type === "vendido");
+      allCars = data.cars || [];
+      const enVenta = allCars.filter(c => c.type === "venta");
+      const vendidos = allCars.filter(c => c.type === "vendido");
 
       ventaGrid.innerHTML = enVenta.length
         ? enVenta.map(ventaCardHTML).join("")
@@ -471,6 +559,85 @@
       vendidoGrid.innerHTML = "";
     }
   }
+
+  function openDetail(carId){
+    const car = allCars.find(c => c.id === carId);
+    if(!car) return;
+
+    modalImgs = (car.images && car.images.length ? car.images : []).map(k => `${API_BASE}/${k}`);
+    if(modalImgs.length === 0) modalImgs = [""];
+    modalIdx = 0;
+    renderModalImage();
+
+    document.getElementById("modalThumbs").innerHTML = modalImgs.length > 1
+      ? modalImgs.map((src, i) => `<img src="${src}" class="${i===0?'active':''}" onclick="modalGoTo(${i})">`).join("")
+      : "";
+    document.getElementById("modalPrev").style.display = modalImgs.length > 1 ? "flex" : "none";
+    document.getElementById("modalNext").style.display = modalImgs.length > 1 ? "flex" : "none";
+
+    const isSold = car.type === "vendido";
+    const dl = (!isSold && car.arrival) ? daysLeftText(car.arrival) : null;
+    const waNumber = "50200000000";
+    const waText = encodeURIComponent(`Hola, me interesa el ${car.title} ($${Number(car.price).toLocaleString('en-US')}) que vi en AutoRemate.`);
+
+    document.getElementById("modalDetails").innerHTML = `
+      <span class="tag ${isSold ? 'tag-vendido' : 'tag-transito'}" style="color:${isSold ? '#fff' : '#111'}">${isSold ? 'Vendido' : 'En tránsito'}</span>
+      <h2>${car.title}</h2>
+      ${dl ? `<div class="modal-countdown-badge ${dl.urgent ? 'urgent':''}">🚢 ${dl.text}</div>` : ''}
+      <div class="modal-price-row">
+        ${isSold
+          ? `<span class="modal-price-sold">$${Number(car.price).toLocaleString('en-US')}</span>`
+          : `<span class="modal-price">$${Number(car.price).toLocaleString('en-US')}</span>`}
+      </div>
+      <div class="modal-specs">
+        ${car.damage ? `<div class="modal-spec"><b>Condición</b><span>${car.damage}</span></div>` : ''}
+        ${car.stock ? `<div class="modal-spec"><b>Stock</b><span>${car.stock}</span></div>` : ''}
+        ${car.arrival ? `<div class="modal-spec"><b>Llegada estimada</b><span>${car.arrival}</span></div>` : ''}
+        <div class="modal-spec"><b>Estado del título</b><span>Sin reparar</span></div>
+      </div>
+      ${!isSold ? `
+      <div class="modal-actions">
+        <a class="btn btn-primary" href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener">Reservar por WhatsApp</a>
+        <a class="btn btn-ghost" style="color:var(--ink);border-color:var(--gray-light)" href="#contacto" onclick="closeDetail()">Contactar por otro medio</a>
+      </div>
+      <p class="modal-note">Vehículo sin reparar, precio de subasta. Documentación en regla al momento de la entrega.</p>
+      ` : `
+      <p class="modal-note">Este vehículo ya fue vendido — se muestra como referencia de nuestro historial e inventario en movimiento.</p>
+      `}
+    `;
+
+    document.getElementById("modalOverlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function renderModalImage(){
+    document.getElementById("modalMainImg").src = modalImgs[modalIdx];
+    document.getElementById("modalCounter").textContent = modalImgs.length > 1 ? `${modalIdx + 1} / ${modalImgs.length}` : "";
+  }
+
+  function modalCycle(dir){
+    modalIdx = (modalIdx + dir + modalImgs.length) % modalImgs.length;
+    renderModalImage();
+    document.querySelectorAll(".modal-thumbs img").forEach((el, i) => el.classList.toggle("active", i === modalIdx));
+  }
+
+  function modalGoTo(i){
+    modalIdx = i;
+    renderModalImage();
+    document.querySelectorAll(".modal-thumbs img").forEach((el, idx) => el.classList.toggle("active", idx === modalIdx));
+  }
+
+  function closeDetail(){
+    document.getElementById("modalOverlay").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  document.addEventListener("keydown", function(e){
+    if(!document.getElementById("modalOverlay").classList.contains("open")) return;
+    if(e.key === "Escape") closeDetail();
+    if(e.key === "ArrowLeft") modalCycle(-1);
+    if(e.key === "ArrowRight") modalCycle(1);
+  });
 
   loadInventory();
   setInterval(loadInventory, 5 * 60 * 1000); // refresh every 5 min so countdowns and new cars stay current
