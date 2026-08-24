@@ -61,6 +61,12 @@
   }
   .file-drop.has-file{border-color:var(--orange);color:var(--ink);}
   #preview{max-width:120px;border-radius:4px;margin-top:10px;display:none;}
+  .thumb{width:64px;height:64px;object-fit:cover;border-radius:4px;border:1px solid var(--line);}
+  .thumb-wrap{position:relative;}
+  .thumb-remove{
+    position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;
+    background:#B23A2E;color:#fff;border:none;font-size:11px;line-height:18px;cursor:pointer;padding:0;
+  }
   .logout{float:right;font-size:12px;color:var(--gray);cursor:pointer;text-decoration:underline;}
   .config-note{font-size:12px;color:var(--gray);margin-top:-14px;margin-bottom:22px;}
 </style>
@@ -116,12 +122,12 @@
       </div>
 
       <div class="field" id="imageField">
-        <label>Foto del vehículo</label>
+        <label>Fotos del vehículo (hasta 10)</label>
         <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
-          Toca aquí para elegir o tomar una foto
+          Toca aquí para elegir hasta 10 fotos
         </div>
-        <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="onFileChosen(this)">
-        <img id="preview">
+        <input id="fileInput" type="file" accept="image/*" multiple style="display:none" onchange="onFilesChosen(this)">
+        <div id="previewGrid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
       </div>
 
       <div class="field" id="sellSelectField" style="display:none">
@@ -219,17 +225,38 @@
     }
   }
 
-  function onFileChosen(input){
-    const file = input.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById("preview").src = e.target.result;
-      document.getElementById("preview").style.display = "block";
-    };
-    reader.readAsDataURL(file);
-    document.getElementById("fileDrop").classList.add("has-file");
-    document.getElementById("fileDrop").textContent = file.name;
+  let selectedFiles = [];
+
+  function onFilesChosen(input){
+    const newFiles = Array.from(input.files || []);
+    selectedFiles = selectedFiles.concat(newFiles).slice(0, 10);
+    input.value = "";
+    renderPreviews();
+  }
+
+  function removeFile(index){
+    selectedFiles.splice(index, 1);
+    renderPreviews();
+  }
+
+  function renderPreviews(){
+    const grid = document.getElementById("previewGrid");
+    grid.innerHTML = "";
+    selectedFiles.forEach((file, i) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const wrap = document.createElement("div");
+        wrap.className = "thumb-wrap";
+        wrap.innerHTML = `<img class="thumb" src="${e.target.result}"><button type="button" class="thumb-remove" onclick="removeFile(${i})">×</button>`;
+        grid.appendChild(wrap);
+      };
+      reader.readAsDataURL(file);
+    });
+    const dropText = selectedFiles.length
+      ? `${selectedFiles.length} foto${selectedFiles.length > 1 ? 's' : ''} seleccionada${selectedFiles.length > 1 ? 's' : ''} — toca para agregar más`
+      : "Toca aquí para elegir hasta 10 fotos";
+    document.getElementById("fileDrop").textContent = dropText;
+    document.getElementById("fileDrop").classList.toggle("has-file", selectedFiles.length > 0);
   }
 
   async function submitCar(){
@@ -265,7 +292,6 @@
 
     const title = document.getElementById("title").value.trim();
     const price = document.getElementById("price").value.trim();
-    const fileInput = document.getElementById("fileInput");
 
     if(!title || !price){
       showMsg("formMsg", "Completa al menos marca/modelo y precio.", "error");
@@ -273,28 +299,29 @@
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Subiendo…";
 
     try{
-      let imageKey = "";
-      if(fileInput.files[0]){
+      const imageKeys = [];
+      for(let i = 0; i < selectedFiles.length; i++){
+        submitBtn.textContent = `Subiendo foto ${i + 1} de ${selectedFiles.length}…`;
         const form = new FormData();
-        form.append("file", fileInput.files[0]);
+        form.append("file", selectedFiles[i]);
         const upRes = await fetch(`${API_BASE}/api/upload`, {
           method: "POST",
           headers: { "Authorization": `Bearer ${token}` },
           body: form
         });
         const upData = await upRes.json();
-        if(!upData.ok){ throw new Error(upData.error || "Error al subir la foto"); }
-        imageKey = upData.key;
+        if(!upData.ok){ throw new Error(upData.error || "Error al subir una foto"); }
+        imageKeys.push(upData.key);
       }
+      submitBtn.textContent = "Guardando…";
 
       const payload = {
         type: "venta",
         title,
         price,
-        image: imageKey,
+        images: imageKeys,
         damage: document.getElementById("damage").value.trim(),
         arrival: document.getElementById("arrival").value,
       };
@@ -312,10 +339,8 @@
       document.getElementById("price").value = "";
       document.getElementById("damage").value = "";
       document.getElementById("arrival").value = "";
-      fileInput.value = "";
-      document.getElementById("preview").style.display = "none";
-      document.getElementById("fileDrop").textContent = "Toca aquí para elegir o tomar una foto";
-      document.getElementById("fileDrop").classList.remove("has-file");
+      selectedFiles = [];
+      renderPreviews();
       loadCars();
     } catch(err){
       showMsg("formMsg", err.message, "error");
@@ -335,19 +360,21 @@
         listEl.textContent = "Todavía no hay carros agregados.";
         return;
       }
-      listEl.innerHTML = data.cars.map(car => `
+      listEl.innerHTML = data.cars.map(car => {
+        const firstImg = (car.images && car.images[0]) || car.image || "";
+        return `
         <div class="car-item">
-          <img src="${car.image ? API_BASE + '/' + car.image : ''}" onerror="this.style.opacity=0">
+          <img src="${firstImg ? API_BASE + '/' + firstImg : ''}" onerror="this.style.opacity=0">
           <div class="info">
             <b>${car.title} <span class="pill ${car.type}">${car.type === 'venta' ? 'En venta' : 'Vendido'}</span></b>
-            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''}</span>
+            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.images && car.images.length > 1 ? '· ' + car.images.length + ' fotos' : ''}</span>
           </div>
           <div class="actions">
             ${car.type === 'venta' ? `<button class="btn-sell" onclick="markSold('${car.id}')">Marcar vendido</button>` : ''}
             <button class="btn-danger" onclick="deleteCar('${car.id}')">Eliminar</button>
           </div>
         </div>
-      `).join("");
+      `;}).join("");
     } catch(e){
       listEl.textContent = "No se pudo cargar la lista.";
     }
