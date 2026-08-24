@@ -94,7 +94,7 @@
         <button type="button" data-type="vendido" onclick="setType('vendido')">Vendido</button>
       </div>
 
-      <div class="row">
+      <div class="row" id="ventaFields">
         <div class="field">
           <label>Marca y modelo</label>
           <input id="title" placeholder="Ej: Toyota Corolla 2015">
@@ -104,14 +104,10 @@
           <input id="price" placeholder="Ej: 4500">
         </div>
       </div>
-      <div class="row">
+      <div class="row" id="ventaFields2">
         <div class="field" id="arrivalField">
           <label>Fecha de llegada</label>
           <input id="arrival" type="date">
-        </div>
-        <div class="field" id="stockField" style="display:none">
-          <label>Número de stock / lote</label>
-          <input id="stock" placeholder="Ej: 19631860">
         </div>
         <div class="field" id="damageField">
           <label>Descripción del daño</label>
@@ -119,13 +115,21 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="imageField">
         <label>Foto del vehículo</label>
         <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
           Toca aquí para elegir o tomar una foto
         </div>
         <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="onFileChosen(this)">
         <img id="preview">
+      </div>
+
+      <div class="field" id="sellSelectField" style="display:none">
+        <label>¿Cuál carro se vendió?</label>
+        <select id="sellSelect">
+          <option value="">Cargando carros en venta…</option>
+        </select>
+        <p class="hint" style="margin-top:6px;color:var(--gray);font-size:12px;">Se toma el precio y la foto del carro tal como estaban en "en venta" — no necesitas volver a escribirlos.</p>
       </div>
 
       <button class="btn btn-primary" id="submitBtn" onclick="submitCar()">Agregar a la página</button>
@@ -140,7 +144,7 @@
 
 <script>
   // Set this once to your deployed Worker URL, e.g. https://autoremate-api.yoursubdomain.workers.dev
-  const API_BASE = "https://autoremate-api.jonagar90.workers.dev";
+  const API_BASE = "https://autoremate-api.YOUR-SUBDOMAIN.workers.dev";
 
   let token = localStorage.getItem("autoremate_admin_token") || "";
   let currentType = "venta";
@@ -188,8 +192,31 @@
   function setType(type){
     currentType = type;
     document.querySelectorAll(".type-toggle button").forEach(b => b.classList.toggle("active", b.dataset.type === type));
-    document.getElementById("arrivalField").style.display = type === "venta" ? "block" : "none";
-    document.getElementById("stockField").style.display = type === "vendido" ? "block" : "none";
+    const isVenta = type === "venta";
+    document.getElementById("ventaFields").style.display = isVenta ? "grid" : "none";
+    document.getElementById("ventaFields2").style.display = isVenta ? "grid" : "none";
+    document.getElementById("imageField").style.display = isVenta ? "block" : "none";
+    document.getElementById("sellSelectField").style.display = isVenta ? "none" : "block";
+    document.getElementById("submitBtn").textContent = isVenta ? "Agregar a la página" : "Marcar como vendido";
+    if(!isVenta){ populateSellDropdown(); }
+  }
+
+  async function populateSellDropdown(){
+    const select = document.getElementById("sellSelect");
+    select.innerHTML = `<option value="">Cargando…</option>`;
+    try{
+      const res = await fetch(`${API_BASE}/api/cars`);
+      const data = await res.json();
+      const enVenta = (data.cars || []).filter(c => c.type === "venta");
+      if(enVenta.length === 0){
+        select.innerHTML = `<option value="">No hay carros en venta ahora mismo</option>`;
+        return;
+      }
+      select.innerHTML = `<option value="">Selecciona un carro…</option>` +
+        enVenta.map(c => `<option value="${c.id}">${c.title} — $${Number(c.price).toLocaleString('en-US')}</option>`).join("");
+    } catch(e){
+      select.innerHTML = `<option value="">No se pudo cargar la lista</option>`;
+    }
   }
 
   function onFileChosen(input){
@@ -207,6 +234,35 @@
 
   async function submitCar(){
     clearMsg("formMsg");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if(currentType === "vendido"){
+      const selectedId = document.getElementById("sellSelect").value;
+      if(!selectedId){
+        showMsg("formMsg", "Elige cuál carro se vendió.", "error");
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Guardando…";
+      try{
+        const res = await fetch(`${API_BASE}/api/cars/${selectedId}/sell`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if(!data.ok) throw new Error(data.error || "No se pudo actualizar");
+        showMsg("formMsg", "Carro marcado como vendido.", "success");
+        document.getElementById("sellSelect").innerHTML = `<option value="">Selecciona un carro…</option>`;
+        loadCars();
+      } catch(err){
+        showMsg("formMsg", err.message, "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Marcar como vendido";
+      }
+      return;
+    }
+
     const title = document.getElementById("title").value.trim();
     const price = document.getElementById("price").value.trim();
     const fileInput = document.getElementById("fileInput");
@@ -216,7 +272,6 @@
       return;
     }
 
-    const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
     submitBtn.textContent = "Subiendo…";
 
@@ -236,13 +291,12 @@
       }
 
       const payload = {
-        type: currentType,
+        type: "venta",
         title,
         price,
         image: imageKey,
         damage: document.getElementById("damage").value.trim(),
         arrival: document.getElementById("arrival").value,
-        stock: document.getElementById("stock").value.trim(),
       };
 
       const res = await fetch(`${API_BASE}/api/cars`, {
@@ -257,7 +311,6 @@
       document.getElementById("title").value = "";
       document.getElementById("price").value = "";
       document.getElementById("damage").value = "";
-      document.getElementById("stock").value = "";
       document.getElementById("arrival").value = "";
       fileInput.value = "";
       document.getElementById("preview").style.display = "none";
@@ -287,7 +340,7 @@
           <img src="${car.image ? API_BASE + '/' + car.image : ''}" onerror="this.style.opacity=0">
           <div class="info">
             <b>${car.title} <span class="pill ${car.type}">${car.type === 'venta' ? 'En venta' : 'Vendido'}</span></b>
-            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.type === 'vendido' && car.stock ? '· stock ' + car.stock : ''}</span>
+            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''}</span>
           </div>
           <div class="actions">
             ${car.type === 'venta' ? `<button class="btn-sell" onclick="markSold('${car.id}')">Marcar vendido</button>` : ''}
