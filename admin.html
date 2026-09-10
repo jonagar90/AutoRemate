@@ -106,7 +106,7 @@
           <input id="title" placeholder="Ej: Toyota Corolla 2015">
         </div>
         <div class="field">
-          <label>Precio (USD)</label>
+          <label>Precio (GTQ)</label>
           <input id="price" placeholder="Ej: 4500">
         </div>
       </div>
@@ -150,7 +150,7 @@
 
 <script>
   // Set this once to your deployed Worker URL, e.g. https://autoremate-api.yoursubdomain.workers.dev
-  const API_BASE = "https://autoremate-api.jonagar90.workers.dev";
+  const API_BASE = "https://autoremate-api.YOUR-SUBDOMAIN.workers.dev";
 
   let token = localStorage.getItem("autoremate_admin_token") || "";
   let currentType = "venta";
@@ -219,7 +219,7 @@
         return;
       }
       select.innerHTML = `<option value="">Selecciona un carro…</option>` +
-        enVenta.map(c => `<option value="${c.id}">${c.title} — $${Number(c.price).toLocaleString('en-US')}</option>`).join("");
+        enVenta.map(c => `<option value="${c.id}">${c.title} — Q${Number(c.price).toLocaleString('es-GT')}</option>`).join("");
     } catch(e){
       select.innerHTML = `<option value="">No se pudo cargar la lista</option>`;
     }
@@ -367,7 +367,7 @@
           <img src="${firstImg ? API_BASE + '/' + firstImg : ''}" onerror="this.style.opacity=0">
           <div class="info">
             <b>${car.title} <span class="pill ${car.type}">${car.type === 'venta' ? 'En venta' : 'Vendido'}</span></b>
-            <span>$${Number(car.price).toLocaleString('en-US')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.images && car.images.length > 1 ? '· ' + car.images.length + ' fotos' : ''}</span>
+            <span>Q${Number(car.price).toLocaleString('es-GT')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.images && car.images.length > 1 ? '· ' + car.images.length + ' fotos' : ''}</span>
           </div>
           <div class="actions">
             ${car.type === 'venta' ? `<button class="btn-sell" onclick="markSold('${car.id}')">Marcar vendido</button>` : ''}
