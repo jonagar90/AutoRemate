@@ -360,6 +360,24 @@
   .testi-author b{display:block;font-size:13px;}
   .testi-author span{display:block;font-size:12px;color:var(--gray);}
   @media(max-width:760px){.testi-grid{grid-template-columns:1fr;}}
+
+  /* subscribe banner */
+  .subscribe{padding:56px 0;background:var(--ink);color:var(--paper);}
+  .subscribe-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .subscribe-text h3{font-family:'Archivo Black',sans-serif;font-size:20px;text-transform:uppercase;margin-bottom:6px;}
+  .subscribe-text p{font-size:14px;color:var(--gray-light);}
+  .subscribe-form{display:flex;gap:10px;flex-wrap:wrap;flex:none;}
+  .subscribe-form input{
+    padding:13px 16px;border-radius:4px;border:1px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.06);color:var(--paper);font-family:'Inter',sans-serif;font-size:14px;min-width:240px;
+  }
+  .subscribe-form input::placeholder{color:var(--gray-light);}
+  .subscribe-form button{
+    padding:13px 22px;border:none;border-radius:4px;background:var(--orange);color:var(--ink);
+    font-weight:700;text-transform:uppercase;font-size:13px;cursor:pointer;
+  }
+  .subscribe-form button:hover{background:var(--paper);}
+  .subscribe-msg{font-size:13px;margin-top:8px;color:var(--orange);}
 </style>
 </head>
 <body>
@@ -449,7 +467,7 @@
       <div class="step">
         <div class="n mono">02 / Ruta</div>
         <h3>Lo publicamos en camino</h3>
-        <p>Mientras el carro viaja hacia Guatemala, lo ofrecemos a precio de subasta, sin reparar, con toda su documentación en regla.</p>
+        <p>Mientras el carro viaja hacia Guatemala, lo ofrecemos a un precio con margen de ganancia, sin reparar, con toda su documentación en regla.</p>
       </div>
       <div class="step">
         <div class="n mono">03 / Tu decisión</div>
@@ -533,6 +551,22 @@
   </div>
 </section>
 
+<section class="subscribe">
+  <div class="wrap subscribe-inner">
+    <div class="subscribe-text">
+      <h3>No te pierdas el próximo carro</h3>
+      <p>Te avisamos por correo apenas subimos un vehículo nuevo — antes de que se venda.</p>
+    </div>
+    <div>
+      <form class="subscribe-form" onsubmit="return subscribeEmail(event)">
+        <input type="email" id="subscribeEmail" placeholder="tu@correo.com" required>
+        <button type="submit">Avísame</button>
+      </form>
+      <div class="subscribe-msg" id="subscribeMsg"></div>
+    </div>
+  </div>
+</section>
+
 <section class="contact" id="contacto">
   <div class="wrap contact-grid">
     <div>
@@ -609,6 +643,31 @@
   let modalImgs = [];
   let modalIdx = 0;
 
+  async function subscribeEmail(evt){
+    evt.preventDefault();
+    const input = document.getElementById("subscribeEmail");
+    const msg = document.getElementById("subscribeMsg");
+    const email = input.value.trim();
+    msg.textContent = "Enviando…";
+    try{
+      const res = await fetch(`${API_BASE}/api/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if(data.ok){
+        msg.textContent = "¡Listo! Te avisaremos por correo.";
+        input.value = "";
+      } else {
+        msg.textContent = data.error || "No se pudo registrar, intenta de nuevo.";
+      }
+    } catch(e){
+      msg.textContent = "No se pudo conectar. Intenta de nuevo.";
+    }
+    return false;
+  }
+
   function daysLeftText(arrival){
     const now = new Date(); now.setHours(0,0,0,0);
     const arr = new Date(arrival + "T00:00:00");
@@ -662,7 +721,7 @@
           <h3>${car.title}</h3>
           <div class="card-meta"><span class="${dl.urgent ? 'countdown urgent' : 'countdown'}">${dl.text}</span><span>·</span><span>${car.damage || ''}</span></div>
           <div class="card-price">
-            <span class="price">$${Number(car.price).toLocaleString('en-US')}</span>
+            <span class="price">Q${Number(car.price).toLocaleString('es-GT')}</span>
             <span class="card-cta">Ver detalles →</span>
           </div>
         </div>
@@ -681,7 +740,7 @@
           <h3>${car.title}</h3>
           <div class="card-meta"><span>${car.stock ? 'Stock ' + car.stock : ''}</span></div>
           <div class="card-price">
-            <span class="price-sold">$${Number(car.price).toLocaleString('en-US')}</span>
+            <span class="price-sold">Q${Number(car.price).toLocaleString('es-GT')}</span>
             <span class="card-cta">Ver detalles →</span>
           </div>
         </div>
@@ -767,7 +826,7 @@
     const isSold = car.type === "vendido";
     const dl = (!isSold && car.arrival) ? daysLeftText(car.arrival) : null;
     const waNumber = "50200000000";
-    const waText = encodeURIComponent(`Hola, me interesa el ${car.title} ($${Number(car.price).toLocaleString('en-US')}) que vi en AutoRemate.`);
+    const waText = encodeURIComponent(`Hola, me interesa el ${car.title} (Q${Number(car.price).toLocaleString('es-GT')}) que vi en AutoRemate.`);
 
     document.getElementById("modalDetails").innerHTML = `
       <span class="tag ${isSold ? 'tag-vendido' : 'tag-transito'}" style="color:${isSold ? '#fff' : '#111'}">${isSold ? 'Vendido' : 'En tránsito'}</span>
@@ -775,8 +834,8 @@
       ${dl ? `<div class="modal-countdown-badge ${dl.urgent ? 'urgent':''}">🚢 ${dl.text}</div>` : ''}
       <div class="modal-price-row">
         ${isSold
-          ? `<span class="modal-price-sold">$${Number(car.price).toLocaleString('en-US')}</span>`
-          : `<span class="modal-price">$${Number(car.price).toLocaleString('en-US')}</span>`}
+          ? `<span class="modal-price-sold">Q${Number(car.price).toLocaleString('es-GT')}</span>`
+          : `<span class="modal-price">Q${Number(car.price).toLocaleString('es-GT')}</span>`}
       </div>
       <div class="modal-specs">
         ${car.damage ? `<div class="modal-spec"><b>Condición</b><span>${car.damage}</span></div>` : ''}
