@@ -4,401 +4,2253 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AutoRemate — Admin</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --ink:#111111; --paper:#FFFFFF; --cream:#F1EFE8;
-    --orange:#FF6A00; --gray:#5F5E5A; --gray-light:#D3D1C7; --line:#E4E1D6;
+:root{
+  --ink:#111111;
+  --paper:#FFFFFF;
+  --cream:#F1EFE8;
+  --orange:#FF6A00;
+  --orange-dark:#C24F00;
+  --gray:#5F5E5A;
+  --gray-light:#D3D1C7;
+  --line:#E4E1D6;
+  --green:#168A49;
+  --red:#B23A2E;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+}
+
+.wrap{
+  max-width:1050px;
+  margin:0 auto;
+  padding:32px 18px 80px;
+}
+
+h1{
+  font-family:'Archivo Black',sans-serif;
+  font-size:26px;
+  text-transform:uppercase;
+}
+
+h1 span{
+  color:var(--orange);
+}
+
+.sub{
+  color:var(--gray);
+  font-size:14px;
+  margin:6px 0 28px;
+}
+
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:26px;
+  margin-bottom:22px;
+}
+
+.panel h2{
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-weight:700;
+  margin-bottom:20px;
+  color:var(--gray);
+}
+
+.section-title{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--orange-dark);
+  font-weight:700;
+  margin:24px 0 12px;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line);
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+label{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--gray);
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  border:1px solid var(--gray-light);
+  border-radius:5px;
+  padding:11px 12px;
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  background:var(--paper);
+  color:var(--ink);
+}
+
+textarea{
+  resize:vertical;
+  min-height:90px;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none;
+  border-color:var(--orange);
+}
+
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.grid-4{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.btn{
+  display:inline-block;
+  padding:13px 22px;
+  border:none;
+  border-radius:5px;
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  cursor:pointer;
+  font-family:'Inter',sans-serif;
+}
+
+.btn-primary{
+  background:var(--orange);
+  color:var(--ink);
+}
+
+.btn-primary:hover{
+  background:var(--ink);
+  color:var(--paper);
+}
+
+.btn-primary:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.btn-secondary{
+  background:transparent;
+  border:1px solid var(--ink);
+  color:var(--ink);
+}
+
+.btn-secondary:hover{
+  background:var(--ink);
+  color:white;
+}
+
+.btn-danger{
+  background:transparent;
+  color:var(--red);
+  border:1px solid var(--red);
+  padding:8px 12px;
+  font-size:11px;
+}
+
+.btn-danger:hover{
+  background:var(--red);
+  color:white;
+}
+
+.btn-sell{
+  background:transparent;
+  color:var(--ink);
+  border:1px solid var(--ink);
+  padding:8px 12px;
+  font-size:11px;
+}
+
+.btn-sell:hover{
+  background:var(--ink);
+  color:white;
+}
+
+.btn-edit{
+  background:var(--orange);
+  color:var(--ink);
+  border:1px solid var(--orange);
+  padding:8px 12px;
+  font-size:11px;
+}
+
+.btn-edit:hover{
+  background:var(--orange-dark);
+  color:white;
+}
+
+.actions-main{
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+}
+
+.status-toggle{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.status-toggle button{
+  padding:12px;
+  border:1px solid var(--gray-light);
+  border-radius:5px;
+  background:white;
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+.status-toggle button.active{
+  background:var(--ink);
+  color:white;
+  border-color:var(--ink);
+}
+
+.status-toggle button[data-status="disponible"].active{
+  background:var(--green);
+  border-color:var(--green);
+}
+
+.msg{
+  font-size:13px;
+  padding:11px 13px;
+  border-radius:5px;
+  margin-bottom:16px;
+}
+
+.msg.error{
+  background:#FBE7E3;
+  color:var(--red);
+}
+
+.msg.success{
+  background:#E8F3E5;
+  color:#2E6B2A;
+}
+
+.login-box{
+  max-width:360px;
+  margin:80px auto 0;
+}
+
+.logout{
+  float:right;
+  font-size:12px;
+  color:var(--gray);
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.file-drop{
+  border:2px dashed var(--gray-light);
+  border-radius:7px;
+  padding:25px;
+  text-align:center;
+  cursor:pointer;
+  font-size:13px;
+  color:var(--gray);
+  transition:.2s;
+}
+
+.file-drop:hover{
+  border-color:var(--orange);
+}
+
+.file-drop.has-file{
+  border-color:var(--orange);
+  color:var(--ink);
+}
+
+#previewGrid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:12px;
+}
+
+.thumb-wrap{
+  position:relative;
+}
+
+.thumb{
+  width:78px;
+  height:78px;
+  object-fit:cover;
+  border-radius:5px;
+  border:1px solid var(--line);
+}
+
+.thumb-remove{
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:var(--red);
+  color:white;
+  border:none;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.existing-label{
+  font-size:11px;
+  color:var(--gray);
+  margin:12px 0 6px;
+}
+
+.inventory-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.inventory-header h2{
+  margin:0;
+}
+
+.count{
+  font-family:'Roboto Mono',monospace;
+  font-size:12px;
+  color:var(--gray);
+}
+
+.car-item{
+  display:grid;
+  grid-template-columns:90px 1fr auto;
+  gap:15px;
+  align-items:center;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  margin-bottom:11px;
+}
+
+.car-item img{
+  width:90px;
+  height:68px;
+  object-fit:cover;
+  border-radius:5px;
+  background:#eee;
+}
+
+.car-info{
+  min-width:0;
+}
+
+.car-title{
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:5px;
+}
+
+.car-meta{
+  font-family:'Roboto Mono',monospace;
+  font-size:11px;
+  color:var(--gray);
+  line-height:1.6;
+}
+
+.car-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.pill{
+  display:inline-block;
+  font-size:9px;
+  text-transform:uppercase;
+  padding:4px 8px;
+  border-radius:12px;
+  font-weight:700;
+  margin-left:6px;
+  vertical-align:middle;
+}
+
+.pill.transito{
+  background:var(--orange);
+  color:var(--ink);
+}
+
+.pill.disponible{
+  background:var(--green);
+  color:white;
+}
+
+.pill.vendido{
+  background:var(--ink);
+  color:white;
+}
+
+.edit-banner{
+  display:none;
+  background:#FFF2E8;
+  border:1px solid #FFD0AE;
+  padding:12px 14px;
+  border-radius:6px;
+  margin-bottom:18px;
+  font-size:13px;
+}
+
+.edit-banner strong{
+  color:var(--orange-dark);
+}
+
+.note{
+  font-size:11px;
+  color:var(--gray);
+  margin-top:6px;
+  line-height:1.5;
+}
+
+@media(max-width:800px){
+  .grid-4,
+  .grid-3{
+    grid-template-columns:1fr 1fr;
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);}
-  .wrap{max-width:760px;margin:0 auto;padding:32px 16px 80px;}
-  h1{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;}
-  h1 span{color:var(--orange);}
-  .sub{color:var(--gray);font-size:14px;margin:6px 0 28px;}
-  .panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:24px;margin-bottom:20px;}
-  .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:16px;color:var(--gray);}
-  .field{margin-bottom:14px;}
-  label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.03em;color:var(--gray);margin-bottom:5px;}
-  input,select{
-    width:100%;border:1px solid var(--gray-light);border-radius:4px;
-    padding:11px 12px;font-family:'Inter',sans-serif;font-size:14px;background:var(--paper);
+
+  .car-item{
+    grid-template-columns:75px 1fr;
   }
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .btn{
-    display:inline-block;padding:13px 22px;border:none;border-radius:4px;
-    font-size:14px;font-weight:700;text-transform:uppercase;cursor:pointer;
+
+  .car-item img{
+    width:75px;
+    height:58px;
   }
-  .btn-primary{background:var(--orange);color:var(--ink);}
-  .btn-primary:hover{background:var(--ink);color:var(--paper);}
-  .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-  .btn-danger{background:transparent;color:#B23A2E;border:1px solid #B23A2E;padding:8px 14px;font-size:12px;}
-  .btn-danger:hover{background:#B23A2E;color:var(--paper);}
-  .btn-sell{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:8px 14px;font-size:12px;}
-  .btn-sell:hover{background:var(--ink);color:var(--paper);}
-  .type-toggle{display:flex;gap:10px;margin-bottom:18px;}
-  .type-toggle button{
-    flex:1;padding:11px;border:1px solid var(--gray-light);border-radius:4px;background:var(--paper);
-    font-size:13px;font-weight:600;text-transform:uppercase;cursor:pointer;
+
+  .car-actions{
+    grid-column:1 / -1;
+    justify-content:flex-start;
   }
-  .type-toggle button.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-  .msg{font-size:13px;padding:10px 12px;border-radius:4px;margin-bottom:14px;}
-  .msg.error{background:#FBE7E3;color:#B23A2E;}
-  .msg.success{background:#E8F3E5;color:#2E6B2A;}
-  .login-box{max-width:340px;margin:80px auto 0;}
-  .car-item{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:6px;margin-bottom:10px;}
-  .car-item img{width:64px;height:48px;object-fit:cover;border-radius:4px;flex:none;background:#eee;}
-  .car-item .info{flex:1;min-width:0;}
-  .car-item .info b{display:block;font-size:14px;}
-  .car-item .info span{display:block;font-size:12px;color:var(--gray);font-family:'Roboto Mono',monospace;}
-  .car-item .actions{display:flex;gap:8px;flex:none;}
-  .pill{font-size:10px;text-transform:uppercase;padding:3px 8px;border-radius:10px;font-weight:700;}
-  .pill.venta{background:var(--orange);color:var(--ink);}
-  .pill.vendido{background:var(--ink);color:var(--paper);}
-  .file-drop{
-    border:2px dashed var(--gray-light);border-radius:6px;padding:20px;text-align:center;
-    cursor:pointer;font-size:13px;color:var(--gray);
+}
+
+@media(max-width:560px){
+  .grid-2,
+  .grid-3,
+  .grid-4{
+    grid-template-columns:1fr;
   }
-  .file-drop.has-file{border-color:var(--orange);color:var(--ink);}
-  #preview{max-width:120px;border-radius:4px;margin-top:10px;display:none;}
-  .thumb{width:64px;height:64px;object-fit:cover;border-radius:4px;border:1px solid var(--line);}
-  .thumb-wrap{position:relative;}
-  .thumb-remove{
-    position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;
-    background:#B23A2E;color:#fff;border:none;font-size:11px;line-height:18px;cursor:pointer;padding:0;
+
+  .status-toggle{
+    grid-template-columns:1fr;
   }
-  .logout{float:right;font-size:12px;color:var(--gray);cursor:pointer;text-decoration:underline;}
-  .config-note{font-size:12px;color:var(--gray);margin-top:-14px;margin-bottom:22px;}
+
+  .actions-main{
+    flex-direction:column;
+  }
+
+  .actions-main .btn{
+    width:100%;
+  }
+
+  .panel{
+    padding:20px 16px;
+  }
+}
 </style>
 </head>
+
 <body>
 
 <div class="wrap">
+
   <h1>Auto<span>Remate</span> — Admin</h1>
-  <p class="sub">Agrega, marca como vendido, o elimina carros directamente desde aquí. Se refleja en la página automáticamente.</p>
+  <p class="sub">
+    Publica y administra los Deals de AutoRemate.
+    Los cambios se reflejan automáticamente en la página.
+  </p>
 
   <!-- LOGIN -->
+
   <div class="panel login-box" id="loginPanel">
+
     <h2>Iniciar sesión</h2>
+
     <div id="loginMsg"></div>
+
     <div class="field">
       <label>Contraseña de administrador</label>
-      <input id="password" type="password" placeholder="••••••••">
+      <input
+        id="password"
+        type="password"
+        placeholder="••••••••"
+      >
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="login()">Entrar</button>
+
+    <button
+      class="btn btn-primary"
+      style="width:100%"
+      onclick="login()"
+    >
+      Entrar
+    </button>
+
   </div>
 
-  <!-- ADMIN CONTENT -->
+
+  <!-- ADMIN -->
+
   <div id="adminContent" style="display:none">
-    <span class="logout" onclick="logout()">Cerrar sesión</span>
+
+    <span class="logout" onclick="logout()">
+      Cerrar sesión
+    </span>
+
+
+    <!-- FORM -->
 
     <div class="panel">
-      <h2>Agregar carro</h2>
+
+      <h2 id="formTitle">Publicar nuevo Deal</h2>
+
       <div id="formMsg"></div>
-      <div class="type-toggle">
-        <button type="button" class="active" data-type="venta" onclick="setType('venta')">En venta (en tránsito)</button>
-        <button type="button" data-type="vendido" onclick="setType('vendido')">Vendido</button>
+
+      <div class="edit-banner" id="editBanner">
+        <strong>EDITANDO DEAL</strong>
+        <span id="editingName"></span>
       </div>
 
-      <div class="row" id="ventaFields">
+
+      <div class="section-title">
+        Estado del Deal
+      </div>
+
+      <div class="status-toggle">
+
+        <button
+          type="button"
+          class="active"
+          data-status="transito"
+          onclick="setStatus('transito')"
+        >
+          En tránsito
+        </button>
+
+        <button
+          type="button"
+          data-status="disponible"
+          onclick="setStatus('disponible')"
+        >
+          Disponible
+        </button>
+
+      </div>
+
+
+      <div class="section-title">
+        Información principal
+      </div>
+
+
+      <div class="grid-4">
+
         <div class="field">
-          <label>Marca y modelo</label>
-          <input id="title" placeholder="Ej: Toyota Corolla 2015">
+          <label>Año *</label>
+          <input
+            id="year"
+            type="number"
+            placeholder="2021"
+          >
         </div>
+
         <div class="field">
-          <label>Precio (GTQ)</label>
-          <input id="price" placeholder="Ej: 4500">
+          <label>Marca *</label>
+          <input
+            id="make"
+            placeholder="Mazda"
+          >
         </div>
-      </div>
-      <div class="row" id="ventaFields2">
-        <div class="field" id="arrivalField">
-          <label>Fecha de llegada</label>
-          <input id="arrival" type="date">
+
+        <div class="field">
+          <label>Modelo *</label>
+          <input
+            id="model"
+            placeholder="CX-5"
+          >
         </div>
-        <div class="field" id="damageField">
-          <label>Descripción del daño</label>
-          <input id="damage" placeholder="Ej: Daño frontal">
+
+        <div class="field">
+          <label>Versión</label>
+          <input
+            id="trim"
+            placeholder="Touring"
+          >
         </div>
+
       </div>
 
-      <div class="field" id="imageField">
-        <label>Fotos del vehículo (hasta 10)</label>
-        <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
-          Toca aquí para elegir hasta 10 fotos
+
+      <div class="grid-3">
+
+        <div class="field">
+          <label>Precio (GTQ) *</label>
+          <input
+            id="price"
+            type="number"
+            placeholder="78500"
+          >
         </div>
-        <input id="fileInput" type="file" accept="image/*" multiple style="display:none" onchange="onFilesChosen(this)">
-        <div id="previewGrid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+
+        <div class="field">
+          <label>Stock</label>
+          <input
+            id="stock"
+            placeholder="AR-1028"
+          >
+        </div>
+
+        <div class="field">
+          <label>Fecha estimada de llegada</label>
+          <input
+            id="arrival"
+            type="date"
+          >
+        </div>
+
       </div>
 
-      <div class="field" id="sellSelectField" style="display:none">
-        <label>¿Cuál carro se vendió?</label>
-        <select id="sellSelect">
-          <option value="">Cargando carros en venta…</option>
-        </select>
-        <p class="hint" style="margin-top:6px;color:var(--gray);font-size:12px;">Se toma el precio y la foto del carro tal como estaban en "en venta" — no necesitas volver a escribirlos.</p>
+
+      <div class="section-title">
+        Datos del vehículo
       </div>
 
-      <button class="btn btn-primary" id="submitBtn" onclick="submitCar()">Agregar a la página</button>
+
+      <div class="grid-3">
+
+        <div class="field">
+          <label>Kilometraje</label>
+          <input
+            id="mileage"
+            type="number"
+            placeholder="42718"
+          >
+        </div>
+
+        <div class="field">
+          <label>Transmisión</label>
+          <select id="transmission">
+            <option value="">Seleccionar…</option>
+            <option>Automática</option>
+            <option>Manual</option>
+            <option>CVT</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Combustible</label>
+          <select id="fuel">
+            <option value="">Seleccionar…</option>
+            <option>Gasolina</option>
+            <option>Diésel</option>
+            <option>Híbrido</option>
+            <option>Eléctrico</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="grid-3">
+
+        <div class="field">
+          <label>Tracción</label>
+          <select id="drivetrain">
+            <option value="">Seleccionar…</option>
+            <option>FWD</option>
+            <option>RWD</option>
+            <option>AWD</option>
+            <option>4WD</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Color</label>
+          <input
+            id="color"
+            placeholder="Machine Gray"
+          >
+        </div>
+
+        <div class="field">
+          <label>Tipo de título</label>
+          <select id="titleType">
+            <option value="">Seleccionar…</option>
+            <option>Clean</option>
+            <option>Salvage</option>
+            <option>Rebuilt</option>
+            <option>Otros</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="section-title">
+        Condición
+      </div>
+
+
+      <div class="field">
+        <label>Condición / descripción del daño</label>
+
+        <textarea
+          id="damage"
+          placeholder="Ej: Daño frontal leve. Arranca y enciende."
+        ></textarea>
+
+        <p class="note">
+          Describe únicamente información confirmada del vehículo.
+        </p>
+      </div>
+
+
+      <div class="section-title">
+        Fotografías
+      </div>
+
+
+      <div class="field">
+
+        <label>Fotos del vehículo — hasta 20</label>
+
+        <div
+          class="file-drop"
+          id="fileDrop"
+          onclick="document.getElementById('fileInput').click()"
+        >
+          Toca aquí para elegir hasta 20 fotos
+        </div>
+
+        <input
+          id="fileInput"
+          type="file"
+          accept="image/*"
+          multiple
+          style="display:none"
+          onchange="onFilesChosen(this)"
+        >
+
+        <div id="existingImages"></div>
+
+        <div id="previewGrid"></div>
+
+      </div>
+
+
+      <div class="actions-main">
+
+        <button
+          class="btn btn-primary"
+          id="submitBtn"
+          onclick="submitDeal()"
+        >
+          Publicar Deal
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          id="cancelEditBtn"
+          onclick="cancelEdit()"
+          style="display:none"
+        >
+          Cancelar edición
+        </button>
+
+      </div>
+
     </div>
+
+
+    <!-- INVENTORY -->
 
     <div class="panel">
-      <h2>Carros actuales</h2>
-      <div id="carList">Cargando…</div>
+
+      <div class="inventory-header">
+        <h2>Deals actuales</h2>
+        <span class="count" id="dealCount"></span>
+      </div>
+
+      <div id="carList">
+        Cargando…
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
+
 <script>
-  // Set this once to your deployed Worker URL, e.g. https://autoremate-api.yoursubdomain.workers.dev
-  const API_BASE = "https://autoremate-api.jonagar90.workers.dev";
 
-  let token = localStorage.getItem("autoremate_admin_token") || "";
-  let currentType = "venta";
-  let uploadedImageKey = "";
+const API_BASE =
+  "https://autoremate-api.jonagar90.workers.dev";
 
-  function showMsg(elId, text, type){
-    document.getElementById(elId).innerHTML = `<div class="msg ${type}">${text}</div>`;
+
+let token =
+  localStorage.getItem(
+    "autoremate_admin_token"
+  ) || "";
+
+
+let currentStatus = "transito";
+
+let selectedFiles = [];
+
+let existingImageKeys = [];
+
+let editingId = null;
+
+let loadedCars = [];
+
+
+/* ------------------------------------------
+   MESSAGES
+------------------------------------------ */
+
+function showMsg(elId,text,type){
+
+  document.getElementById(elId).innerHTML =
+    `<div class="msg ${type}">${text}</div>`;
+
+}
+
+function clearMsg(elId){
+
+  document.getElementById(elId).innerHTML = "";
+
+}
+
+
+/* ------------------------------------------
+   LOGIN
+------------------------------------------ */
+
+async function login(){
+
+  const password =
+    document.getElementById("password").value;
+
+  if(!password){
+
+    showMsg(
+      "loginMsg",
+      "Escribe la contraseña.",
+      "error"
+    );
+
+    return;
   }
-  function clearMsg(elId){ document.getElementById(elId).innerHTML = ""; }
 
-  async function login(){
-    const password = document.getElementById("password").value;
-    if(!password){ showMsg("loginMsg","Escribe la contraseña","error"); return; }
-    try{
-      const res = await fetch(`${API_BASE}/api/login`, {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ password })
-      });
-      const data = await res.json();
-      if(data.ok){
-        token = data.token;
-        localStorage.setItem("autoremate_admin_token", token);
-        showAdmin();
-      } else {
-        showMsg("loginMsg", data.error || "Contraseña incorrecta", "error");
-      }
-    } catch(e){
-      showMsg("loginMsg", "No se pudo conectar al servidor. Revisa API_BASE en el código.", "error");
+  try{
+
+    const res =
+      await fetch(
+        `${API_BASE}/api/login`,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            password
+          })
+        }
+      );
+
+    const data =
+      await res.json();
+
+    if(data.ok){
+
+      token = data.token;
+
+      localStorage.setItem(
+        "autoremate_admin_token",
+        token
+      );
+
+      showAdmin();
+
+    }else{
+
+      showMsg(
+        "loginMsg",
+        data.error ||
+          "Contraseña incorrecta.",
+        "error"
+      );
+
     }
+
+  }catch(e){
+
+    showMsg(
+      "loginMsg",
+      "No se pudo conectar al servidor.",
+      "error"
+    );
+
   }
 
-  function logout(){
-    token = "";
-    localStorage.removeItem("autoremate_admin_token");
-    document.getElementById("loginPanel").style.display = "block";
-    document.getElementById("adminContent").style.display = "none";
-  }
+}
 
-  function showAdmin(){
-    document.getElementById("loginPanel").style.display = "none";
-    document.getElementById("adminContent").style.display = "block";
-    loadCars();
-  }
 
-  function setType(type){
-    currentType = type;
-    document.querySelectorAll(".type-toggle button").forEach(b => b.classList.toggle("active", b.dataset.type === type));
-    const isVenta = type === "venta";
-    document.getElementById("ventaFields").style.display = isVenta ? "grid" : "none";
-    document.getElementById("ventaFields2").style.display = isVenta ? "grid" : "none";
-    document.getElementById("imageField").style.display = isVenta ? "block" : "none";
-    document.getElementById("sellSelectField").style.display = isVenta ? "none" : "block";
-    document.getElementById("submitBtn").textContent = isVenta ? "Agregar a la página" : "Marcar como vendido";
-    if(!isVenta){ populateSellDropdown(); }
-  }
+function logout(){
 
-  async function populateSellDropdown(){
-    const select = document.getElementById("sellSelect");
-    select.innerHTML = `<option value="">Cargando…</option>`;
-    try{
-      const res = await fetch(`${API_BASE}/api/cars`);
-      const data = await res.json();
-      const enVenta = (data.cars || []).filter(c => c.type === "venta");
-      if(enVenta.length === 0){
-        select.innerHTML = `<option value="">No hay carros en venta ahora mismo</option>`;
-        return;
-      }
-      select.innerHTML = `<option value="">Selecciona un carro…</option>` +
-        enVenta.map(c => `<option value="${c.id}">${c.title} — Q${Number(c.price).toLocaleString('es-GT')}</option>`).join("");
-    } catch(e){
-      select.innerHTML = `<option value="">No se pudo cargar la lista</option>`;
-    }
-  }
+  token = "";
 
-  let selectedFiles = [];
+  localStorage.removeItem(
+    "autoremate_admin_token"
+  );
 
-  function onFilesChosen(input){
-    const newFiles = Array.from(input.files || []);
-    selectedFiles = selectedFiles.concat(newFiles).slice(0, 10);
+  document.getElementById(
+    "loginPanel"
+  ).style.display = "block";
+
+  document.getElementById(
+    "adminContent"
+  ).style.display = "none";
+
+}
+
+
+function showAdmin(){
+
+  document.getElementById(
+    "loginPanel"
+  ).style.display = "none";
+
+  document.getElementById(
+    "adminContent"
+  ).style.display = "block";
+
+  loadCars();
+
+}
+
+
+/* ------------------------------------------
+   STATUS
+------------------------------------------ */
+
+function setStatus(status){
+
+  currentStatus = status;
+
+  document
+    .querySelectorAll(
+      ".status-toggle button"
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.status === status
+      );
+
+    });
+
+}
+
+
+/* ------------------------------------------
+   FILES
+------------------------------------------ */
+
+function onFilesChosen(input){
+
+  const newFiles =
+    Array.from(input.files || []);
+
+  const remaining =
+    20 -
+    existingImageKeys.length -
+    selectedFiles.length;
+
+  if(remaining <= 0){
+
+    alert(
+      "Este Deal ya tiene 20 fotografías."
+    );
+
     input.value = "";
-    renderPreviews();
+
+    return;
   }
 
-  function removeFile(index){
-    selectedFiles.splice(index, 1);
-    renderPreviews();
+  selectedFiles =
+    selectedFiles.concat(
+      newFiles.slice(0,remaining)
+    );
+
+  input.value = "";
+
+  renderPreviews();
+
+}
+
+
+function removeFile(index){
+
+  selectedFiles.splice(index,1);
+
+  renderPreviews();
+
+}
+
+
+function removeExistingImage(index){
+
+  existingImageKeys.splice(index,1);
+
+  renderExistingImages();
+
+  renderPreviews();
+
+}
+
+
+function renderExistingImages(){
+
+  const container =
+    document.getElementById(
+      "existingImages"
+    );
+
+  if(!existingImageKeys.length){
+
+    container.innerHTML = "";
+
+    return;
   }
 
-  function renderPreviews(){
-    const grid = document.getElementById("previewGrid");
-    grid.innerHTML = "";
-    selectedFiles.forEach((file, i) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const wrap = document.createElement("div");
-        wrap.className = "thumb-wrap";
-        wrap.innerHTML = `<img class="thumb" src="${e.target.result}"><button type="button" class="thumb-remove" onclick="removeFile(${i})">×</button>`;
+  container.innerHTML =
+    `
+      <div class="existing-label">
+        Fotografías actuales
+      </div>
+
+      <div style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:9px;
+      ">
+
+      ${existingImageKeys
+        .map((key,index) => `
+
+          <div class="thumb-wrap">
+
+            <img
+              class="thumb"
+              src="${API_BASE}/${key}"
+            >
+
+            <button
+              type="button"
+              class="thumb-remove"
+              onclick="removeExistingImage(${index})"
+            >
+              ×
+            </button>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+    `;
+
+}
+
+
+function renderPreviews(){
+
+  const grid =
+    document.getElementById(
+      "previewGrid"
+    );
+
+  grid.innerHTML = "";
+
+  selectedFiles.forEach(
+    (file,index) => {
+
+      const reader =
+        new FileReader();
+
+      reader.onload = event => {
+
+        const wrap =
+          document.createElement("div");
+
+        wrap.className =
+          "thumb-wrap";
+
+        wrap.innerHTML =
+          `
+            <img
+              class="thumb"
+              src="${event.target.result}"
+            >
+
+            <button
+              type="button"
+              class="thumb-remove"
+              onclick="removeFile(${index})"
+            >
+              ×
+            </button>
+          `;
+
         grid.appendChild(wrap);
+
       };
+
       reader.readAsDataURL(file);
-    });
-    const dropText = selectedFiles.length
-      ? `${selectedFiles.length} foto${selectedFiles.length > 1 ? 's' : ''} seleccionada${selectedFiles.length > 1 ? 's' : ''} — toca para agregar más`
-      : "Toca aquí para elegir hasta 10 fotos";
-    document.getElementById("fileDrop").textContent = dropText;
-    document.getElementById("fileDrop").classList.toggle("has-file", selectedFiles.length > 0);
+
+    }
+  );
+
+
+  const total =
+    existingImageKeys.length +
+    selectedFiles.length;
+
+
+  const text =
+    total
+      ? `${total} de 20 fotos — toca para agregar más`
+      : "Toca aquí para elegir hasta 20 fotos";
+
+
+  document.getElementById(
+    "fileDrop"
+  ).textContent = text;
+
+
+  document.getElementById(
+    "fileDrop"
+  ).classList.toggle(
+    "has-file",
+    total > 0
+  );
+
+}
+
+
+/* ------------------------------------------
+   FORM HELPERS
+------------------------------------------ */
+
+function value(id){
+
+  return document
+    .getElementById(id)
+    .value
+    .trim();
+
+}
+
+
+function buildTitle(){
+
+  const year =
+    value("year");
+
+  const make =
+    value("make");
+
+  const model =
+    value("model");
+
+  const trim =
+    value("trim");
+
+  return [
+    year,
+    make,
+    model,
+    trim
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+}
+
+
+function resetForm(){
+
+  [
+    "year",
+    "make",
+    "model",
+    "trim",
+    "price",
+    "stock",
+    "arrival",
+    "mileage",
+    "transmission",
+    "fuel",
+    "drivetrain",
+    "color",
+    "titleType",
+    "damage"
+  ].forEach(id => {
+
+    document.getElementById(id).value = "";
+
+  });
+
+
+  currentStatus = "transito";
+
+  setStatus("transito");
+
+
+  selectedFiles = [];
+
+  existingImageKeys = [];
+
+  editingId = null;
+
+
+  renderExistingImages();
+
+  renderPreviews();
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Publicar nuevo Deal";
+
+
+  document.getElementById(
+    "submitBtn"
+  ).textContent =
+    "Publicar Deal";
+
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "editBanner"
+  ).style.display =
+    "none";
+
+}
+
+
+function cancelEdit(){
+
+  resetForm();
+
+  clearMsg("formMsg");
+
+}
+
+
+/* ------------------------------------------
+   SUBMIT
+------------------------------------------ */
+
+async function submitDeal(){
+
+  clearMsg("formMsg");
+
+
+  const submitBtn =
+    document.getElementById(
+      "submitBtn"
+    );
+
+
+  const year =
+    value("year");
+
+  const make =
+    value("make");
+
+  const model =
+    value("model");
+
+  const price =
+    value("price");
+
+
+  if(
+    !year ||
+    !make ||
+    !model ||
+    !price
+  ){
+
+    showMsg(
+      "formMsg",
+      "Completa año, marca, modelo y precio.",
+      "error"
+    );
+
+    return;
+
   }
 
-  async function submitCar(){
-    clearMsg("formMsg");
-    const submitBtn = document.getElementById("submitBtn");
 
-    if(currentType === "vendido"){
-      const selectedId = document.getElementById("sellSelect").value;
-      if(!selectedId){
-        showMsg("formMsg", "Elige cuál carro se vendió.", "error");
-        return;
+  const title =
+    buildTitle();
+
+
+  submitBtn.disabled = true;
+
+
+  try{
+
+    /*
+     * Upload NEW images first.
+     */
+
+    const newImageKeys = [];
+
+
+    for(
+      let i = 0;
+      i < selectedFiles.length;
+      i++
+    ){
+
+      submitBtn.textContent =
+        `Subiendo foto ${i+1} de ${selectedFiles.length}…`;
+
+
+      const form =
+        new FormData();
+
+
+      form.append(
+        "file",
+        selectedFiles[i]
+      );
+
+
+      const uploadResponse =
+        await fetch(
+          `${API_BASE}/api/upload`,
+          {
+            method:"POST",
+
+            headers:{
+              "Authorization":
+                `Bearer ${token}`
+            },
+
+            body:form
+          }
+        );
+
+
+      const uploadData =
+        await uploadResponse.json();
+
+
+      if(!uploadData.ok){
+
+        throw new Error(
+          uploadData.error ||
+          "Error al subir una fotografía."
+        );
+
       }
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Guardando…";
-      try{
-        const res = await fetch(`${API_BASE}/api/cars/${selectedId}/sell`, {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if(!data.ok) throw new Error(data.error || "No se pudo actualizar");
-        showMsg("formMsg", "Carro marcado como vendido.", "success");
-        document.getElementById("sellSelect").innerHTML = `<option value="">Selecciona un carro…</option>`;
-        loadCars();
-      } catch(err){
-        showMsg("formMsg", err.message, "error");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Marcar como vendido";
-      }
+
+
+      newImageKeys.push(
+        uploadData.key
+      );
+
+    }
+
+
+    submitBtn.textContent =
+      editingId
+        ? "Guardando cambios…"
+        : "Publicando Deal…";
+
+
+    const images =
+      existingImageKeys
+        .concat(newImageKeys)
+        .slice(0,20);
+
+
+    const payload = {
+
+      status:currentStatus,
+
+      type:
+        currentStatus === "vendido"
+          ? "vendido"
+          : "venta",
+
+      title,
+
+      year:Number(year),
+
+      make,
+
+      model,
+
+      trim:value("trim"),
+
+      price:Number(price),
+
+      stock:value("stock"),
+
+      arrival:value("arrival"),
+
+      mileage:
+        value("mileage")
+          ? Number(value("mileage"))
+          : "",
+
+      transmission:
+        value("transmission"),
+
+      fuel:
+        value("fuel"),
+
+      drivetrain:
+        value("drivetrain"),
+
+      color:
+        value("color"),
+
+      titleType:
+        value("titleType"),
+
+      damage:
+        value("damage"),
+
+      images
+
+    };
+
+
+    const url =
+      editingId
+        ? `${API_BASE}/api/cars/${editingId}`
+        : `${API_BASE}/api/cars`;
+
+
+    const method =
+      editingId
+        ? "PATCH"
+        : "POST";
+
+
+    const response =
+      await fetch(
+        url,
+        {
+          method,
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              `Bearer ${token}`
+          },
+
+          body:
+            JSON.stringify(payload)
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.error ||
+        "No se pudo guardar el Deal."
+      );
+
+    }
+
+
+    const wasEditing =
+      Boolean(editingId);
+
+
+    resetForm();
+
+
+    showMsg(
+      "formMsg",
+      wasEditing
+        ? "Deal actualizado correctamente."
+        : "Deal publicado correctamente. Ya está disponible para el sitio.",
+      "success"
+    );
+
+
+    await loadCars();
+
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+
+  }catch(error){
+
+    showMsg(
+      "formMsg",
+      error.message,
+      "error"
+    );
+
+
+  }finally{
+
+    submitBtn.disabled = false;
+
+
+    if(!editingId){
+
+      submitBtn.textContent =
+        "Publicar Deal";
+
+    }
+
+  }
+
+}
+
+
+/* ------------------------------------------
+   LOAD INVENTORY
+------------------------------------------ */
+
+async function loadCars(){
+
+  const list =
+    document.getElementById(
+      "carList"
+    );
+
+
+  list.textContent =
+    "Cargando…";
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/cars`
+      );
+
+
+    const data =
+      await response.json();
+
+
+    loadedCars =
+      data.cars || [];
+
+
+    document.getElementById(
+      "dealCount"
+    ).textContent =
+      `${loadedCars.length} Deal${
+        loadedCars.length === 1
+          ? ""
+          : "s"
+      }`;
+
+
+    if(!loadedCars.length){
+
+      list.textContent =
+        "Todavía no hay Deals publicados.";
+
       return;
+
     }
 
-    const title = document.getElementById("title").value.trim();
-    const price = document.getElementById("price").value.trim();
 
-    if(!title || !price){
-      showMsg("formMsg", "Completa al menos marca/modelo y precio.", "error");
-      return;
+    list.innerHTML =
+      loadedCars
+        .map(car => {
+
+          const firstImage =
+            car.images &&
+            car.images.length
+              ? car.images[0]
+              : "";
+
+
+          const status =
+            car.status ||
+            (
+              car.type === "vendido"
+                ? "vendido"
+                : "transito"
+            );
+
+
+          const statusText = {
+
+            transito:"En tránsito",
+
+            disponible:"Disponible",
+
+            vendido:"Vendido"
+
+          }[status] || status;
+
+
+          const stockText =
+            car.stock
+              ? ` · ${car.stock}`
+              : "";
+
+
+          const arrivalText =
+            car.arrival &&
+            status === "transito"
+              ? ` · llega ${car.arrival}`
+              : "";
+
+
+          return `
+
+            <div class="car-item">
+
+              <img
+                src="${
+                  firstImage
+                    ? API_BASE +
+                      "/" +
+                      firstImage
+                    : ""
+                }"
+                onerror="
+                  this.style.opacity=.15
+                "
+              >
+
+              <div class="car-info">
+
+                <div class="car-title">
+
+                  ${escapeHtml(car.title)}
+
+                  <span
+                    class="pill ${status}"
+                  >
+                    ${statusText}
+                  </span>
+
+                </div>
+
+
+                <div class="car-meta">
+
+                  Q${Number(
+                    car.price || 0
+                  ).toLocaleString(
+                    "es-GT"
+                  )}
+
+                  ${stockText}
+
+                  ${arrivalText}
+
+                  ${
+                    car.images &&
+                    car.images.length
+                      ? ` · ${car.images.length} fotos`
+                      : ""
+                  }
+
+                </div>
+
+              </div>
+
+
+              <div class="car-actions">
+
+                ${
+                  status !== "vendido"
+                    ? `
+                      <button
+                        class="btn-edit"
+                        onclick="
+                          editDeal('${car.id}')
+                        "
+                      >
+                        Editar
+                      </button>
+                    `
+                    : ""
+                }
+
+
+                ${
+                  status === "transito"
+                    ? `
+                      <button
+                        class="btn-sell"
+                        onclick="
+                          changeStatus(
+                            '${car.id}',
+                            'disponible'
+                          )
+                        "
+                      >
+                        Disponible
+                      </button>
+                    `
+                    : ""
+                }
+
+
+                ${
+                  status === "disponible"
+                    ? `
+                      <button
+                        class="btn-sell"
+                        onclick="
+                          changeStatus(
+                            '${car.id}',
+                            'transito'
+                          )
+                        "
+                      >
+                        En tránsito
+                      </button>
+                    `
+                    : ""
+                }
+
+
+                ${
+                  status !== "vendido"
+                    ? `
+                      <button
+                        class="btn-sell"
+                        onclick="
+                          markSold('${car.id}')
+                        "
+                      >
+                        Vendido
+                      </button>
+                    `
+                    : ""
+                }
+
+
+                <button
+                  class="btn-danger"
+                  onclick="
+                    deleteCar('${car.id}')
+                  "
+                >
+                  Eliminar
+                </button>
+
+              </div>
+
+            </div>
+
+          `;
+
+        })
+        .join("");
+
+
+  }catch(error){
+
+    list.textContent =
+      "No se pudo cargar el inventario.";
+
+  }
+
+}
+
+
+/* ------------------------------------------
+   EDIT
+------------------------------------------ */
+
+function editDeal(id){
+
+  const car =
+    loadedCars.find(
+      item => item.id === id
+    );
+
+
+  if(!car){
+
+    alert(
+      "No se encontró el Deal."
+    );
+
+    return;
+
+  }
+
+
+  editingId = id;
+
+
+  const status =
+    car.status ||
+    (
+      car.type === "vendido"
+        ? "vendido"
+        : "transito"
+    );
+
+
+  /*
+   * Sold Deals aren't editable from
+   * the normal form.
+   */
+
+  currentStatus =
+    status === "vendido"
+      ? "disponible"
+      : status;
+
+
+  setStatus(currentStatus);
+
+
+  document.getElementById(
+    "year"
+  ).value =
+    car.year || "";
+
+
+  document.getElementById(
+    "make"
+  ).value =
+    car.make || "";
+
+
+  document.getElementById(
+    "model"
+  ).value =
+    car.model || "";
+
+
+  document.getElementById(
+    "trim"
+  ).value =
+    car.trim || "";
+
+
+  /*
+   * Legacy records may only have title.
+   * We do not attempt to guess their
+   * make/model/year automatically.
+   */
+
+
+  document.getElementById(
+    "price"
+  ).value =
+    car.price || "";
+
+
+  document.getElementById(
+    "stock"
+  ).value =
+    car.stock || "";
+
+
+  document.getElementById(
+    "arrival"
+  ).value =
+    car.arrival || "";
+
+
+  document.getElementById(
+    "mileage"
+  ).value =
+    car.mileage || "";
+
+
+  document.getElementById(
+    "transmission"
+  ).value =
+    car.transmission || "";
+
+
+  document.getElementById(
+    "fuel"
+  ).value =
+    car.fuel || "";
+
+
+  document.getElementById(
+    "drivetrain"
+  ).value =
+    car.drivetrain || "";
+
+
+  document.getElementById(
+    "color"
+  ).value =
+    car.color || "";
+
+
+  document.getElementById(
+    "titleType"
+  ).value =
+    car.titleType || "";
+
+
+  document.getElementById(
+    "damage"
+  ).value =
+    car.damage || "";
+
+
+  existingImageKeys =
+    Array.isArray(car.images)
+      ? [...car.images]
+      : [];
+
+
+  selectedFiles = [];
+
+
+  renderExistingImages();
+
+  renderPreviews();
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Editar Deal";
+
+
+  document.getElementById(
+    "editingName"
+  ).textContent =
+    ` — ${car.title}`;
+
+
+  document.getElementById(
+    "editBanner"
+  ).style.display =
+    "block";
+
+
+  document.getElementById(
+    "submitBtn"
+  ).textContent =
+    "Guardar cambios";
+
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).style.display =
+    "inline-block";
+
+
+  clearMsg("formMsg");
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* ------------------------------------------
+   CHANGE STATUS
+------------------------------------------ */
+
+async function changeStatus(
+  id,
+  status
+){
+
+  const text =
+    status === "disponible"
+      ? "¿Marcar este Deal como disponible?"
+      : "¿Cambiar este Deal a en tránsito?";
+
+
+  if(!confirm(text)){
+    return;
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/cars/${id}`,
+        {
+          method:"PATCH",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              `Bearer ${token}`
+          },
+
+          body:
+            JSON.stringify({
+              status
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.error ||
+        "No se pudo actualizar."
+      );
+
     }
 
-    submitBtn.disabled = true;
 
-    try{
-      const imageKeys = [];
-      for(let i = 0; i < selectedFiles.length; i++){
-        submitBtn.textContent = `Subiendo foto ${i + 1} de ${selectedFiles.length}…`;
-        const form = new FormData();
-        form.append("file", selectedFiles[i]);
-        const upRes = await fetch(`${API_BASE}/api/upload`, {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${token}` },
-          body: form
-        });
-        const upData = await upRes.json();
-        if(!upData.ok){ throw new Error(upData.error || "Error al subir una foto"); }
-        imageKeys.push(upData.key);
-      }
-      submitBtn.textContent = "Guardando…";
+    await loadCars();
 
-      const payload = {
-        type: "venta",
-        title,
-        price,
-        images: imageKeys,
-        damage: document.getElementById("damage").value.trim(),
-        arrival: document.getElementById("arrival").value,
-      };
 
-      const res = await fetch(`${API_BASE}/api/cars`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if(!data.ok) throw new Error(data.error || "Error al guardar");
+  }catch(error){
 
-      showMsg("formMsg", "Carro agregado — ya está visible en la página.", "success");
-      document.getElementById("title").value = "";
-      document.getElementById("price").value = "";
-      document.getElementById("damage").value = "";
-      document.getElementById("arrival").value = "";
-      selectedFiles = [];
-      renderPreviews();
-      loadCars();
-    } catch(err){
-      showMsg("formMsg", err.message, "error");
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Agregar a la página";
+    alert(error.message);
+
+  }
+
+}
+
+
+/* ------------------------------------------
+   SOLD
+------------------------------------------ */
+
+async function markSold(id){
+
+  if(
+    !confirm(
+      "¿Confirmas que este Deal fue vendido?"
+    )
+  ){
+    return;
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/cars/${id}/sell`,
+        {
+          method:"POST",
+
+          headers:{
+            "Authorization":
+              `Bearer ${token}`
+          }
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.error ||
+        "No se pudo actualizar."
+      );
+
     }
+
+
+    await loadCars();
+
+
+  }catch(error){
+
+    alert(error.message);
+
   }
 
-  async function loadCars(){
-    const listEl = document.getElementById("carList");
-    listEl.textContent = "Cargando…";
-    try{
-      const res = await fetch(`${API_BASE}/api/cars`);
-      const data = await res.json();
-      if(!data.cars || data.cars.length === 0){
-        listEl.textContent = "Todavía no hay carros agregados.";
-        return;
-      }
-      listEl.innerHTML = data.cars.map(car => {
-        const firstImg = (car.images && car.images[0]) || car.image || "";
-        return `
-        <div class="car-item">
-          <img src="${firstImg ? API_BASE + '/' + firstImg : ''}" onerror="this.style.opacity=0">
-          <div class="info">
-            <b>${car.title} <span class="pill ${car.type}">${car.type === 'venta' ? 'En venta' : 'Vendido'}</span></b>
-            <span>Q${Number(car.price).toLocaleString('es-GT')} ${car.type === 'venta' && car.arrival ? '· llega ' + car.arrival : ''} ${car.images && car.images.length > 1 ? '· ' + car.images.length + ' fotos' : ''}</span>
-          </div>
-          <div class="actions">
-            ${car.type === 'venta' ? `<button class="btn-sell" onclick="markSold('${car.id}')">Marcar vendido</button>` : ''}
-            <button class="btn-danger" onclick="deleteCar('${car.id}')">Eliminar</button>
-          </div>
-        </div>
-      `;}).join("");
-    } catch(e){
-      listEl.textContent = "No se pudo cargar la lista.";
+}
+
+
+/* ------------------------------------------
+   DELETE
+------------------------------------------ */
+
+async function deleteCar(id){
+
+  if(
+    !confirm(
+      "¿Eliminar este Deal? Esta acción no se puede deshacer."
+    )
+  ){
+    return;
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/cars/${id}`,
+        {
+          method:"DELETE",
+
+          headers:{
+            "Authorization":
+              `Bearer ${token}`
+          }
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.error ||
+        "No se pudo eliminar."
+      );
+
     }
+
+
+    if(editingId === id){
+
+      resetForm();
+
+    }
+
+
+    await loadCars();
+
+
+  }catch(error){
+
+    alert(error.message);
+
   }
 
-  async function markSold(id){
-    await fetch(`${API_BASE}/api/cars/${id}/sell`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    loadCars();
-  }
+}
 
-  async function deleteCar(id){
-    if(!confirm("¿Eliminar este carro de la página?")) return;
-    await fetch(`${API_BASE}/api/cars/${id}`, {
-      method: "DELETE",
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    loadCars();
-  }
 
-  // auto-login if token saved
-  if(token){ showAdmin(); }
+/* ------------------------------------------
+   SECURITY / DISPLAY
+------------------------------------------ */
+
+function escapeHtml(value){
+
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* ------------------------------------------
+   AUTO LOGIN
+------------------------------------------ */
+
+if(token){
+
+  showAdmin();
+
+}
+
 </script>
+
 </body>
 </html>
