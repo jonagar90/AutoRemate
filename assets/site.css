@@ -180,3 +180,33 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
 .detailColumns .infoLine{display:flex;align-items:flex-start;gap:4px}
 .detailColumns .infoLine span{font-size:17px;font-weight:900}
 @media(max-width:700px){.detailThumb{flex-basis:88px!important;height:64px!important}}
+
+/* v14 — compact gallery + cyclic navigation + fullscreen viewer */
+.detailLogoLink{display:inline-flex;align-items:center}
+.detailMain{padding-top:14px}
+.detailToolbar{margin-bottom:12px}
+.detailHero{gap:34px}
+.detailMainPhoto{height:430px!important;isolation:isolate}
+.dealPhotoBackdrop{position:absolute;inset:-18px;z-index:0;background-position:center;background-size:cover;filter:blur(22px) brightness(.30);transform:scale(1.08)}
+.detailMainPhoto>img{position:relative;z-index:1;object-fit:contain!important;background:transparent!important}
+.photoNav,.photoExpand{position:absolute;z-index:3;border:1px solid rgba(255,255,255,.2);background:rgba(5,8,9,.62);color:#fff;backdrop-filter:blur(5px);cursor:pointer;display:grid;place-items:center;box-shadow:0 5px 18px rgba(0,0,0,.25)}
+.photoNav{top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;font-size:34px;line-height:1}
+.photoPrev{left:14px}.photoNext{right:14px}
+.photoExpand{right:14px;top:14px;width:40px;height:40px;border-radius:50%;font-size:20px}
+.photoCount{z-index:3}
+.thumbRail{position:relative;margin-top:10px}
+.detailThumbs{margin-top:0!important;scrollbar-width:none!important;-ms-overflow-style:none}
+.detailThumbs::-webkit-scrollbar{display:none}
+.detailThumb{flex:0 0 104px!important;height:70px!important}
+.thumbRailNext{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:38px;height:54px;border:0;border-radius:8px;background:rgba(15,19,20,.86);color:white;font-size:28px;cursor:pointer;box-shadow:-10px 0 18px rgba(0,0,0,.28)}
+.detailTrust{margin-top:24px}
+.detailColumns{margin-top:20px;padding-top:18px}
+.photoViewer{display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);align-items:center;justify-content:center;padding:34px}
+.photoViewer.open{display:flex}
+.photoViewer>img{max-width:min(94vw,1500px);max-height:90vh;object-fit:contain;box-shadow:0 20px 70px rgba(0,0,0,.55)}
+.viewerClose,.viewerNav{position:absolute;z-index:2;border:1px solid rgba(255,255,255,.22);background:rgba(20,24,25,.72);color:white;cursor:pointer;display:grid;place-items:center}
+.viewerClose{right:24px;top:20px;width:46px;height:46px;border-radius:50%;font-size:30px}
+.viewerNav{top:50%;transform:translateY(-50%);width:52px;height:62px;border-radius:12px;font-size:40px}.viewerPrev{left:22px}.viewerNext{right:22px}
+.viewerCount{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(15,18,19,.78);padding:8px 14px;border-radius:20px;font-weight:800}
+@media(max-width:1050px){.detailMainPhoto{height:410px!important}}
+@media(max-width:700px){.detailMainPhoto{height:310px!important}.detailThumb{flex-basis:82px!important;height:58px!important}.photoNav{width:38px;height:38px}.photoViewer{padding:15px}.viewerNav{width:42px;height:52px}.viewerPrev{left:8px}.viewerNext{right:8px}.viewerClose{right:12px;top:12px}}
