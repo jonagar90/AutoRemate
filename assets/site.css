@@ -9,3 +9,37 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:100;display:none;overflow:auto;padding:30px}.modal.open{display:block}.modalBox{position:relative;width:min(1400px,100%);margin:auto;background:#0b0e0f;border:1px solid #303638;border-radius:18px;overflow:hidden}.modalClose{position:absolute;right:18px;top:18px;z-index:5;width:42px;height:42px;border-radius:50%;background:#111617;border:1px solid #444;color:white;font-size:25px}.modalGrid{display:grid;grid-template-columns:1.45fr .75fr}.gallery{padding:30px;background:#080a0b}.mainPhoto{height:560px}.mainPhoto img{width:100%;height:100%;object-fit:contain}.thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}.thumb{height:72px;border:1px solid #333;background:#111;padding:0;border-radius:6px;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.modalInfo{padding:60px 40px}.modalInfo h2{font-size:38px;margin:18px 0 8px}.modalPrice{font-size:38px;color:var(--orange);font-weight:900;margin:15px 0 25px}.facts{border-top:1px solid #292e30}.fact{display:grid;grid-template-columns:140px 1fr;padding:13px 0;border-bottom:1px solid #292e30;font-size:13px}.fact span{color:var(--muted)}
 @media(max-width:1050px){.nav{gap:20px}.dealGrid{grid-template-columns:repeat(2,1fr)}.benefitsGrid{grid-template-columns:repeat(2,1fr)}.modalGrid{grid-template-columns:1fr}.mainPhoto{height:450px}}
 @media(max-width:720px){.shell{width:calc(100% - 28px)}.siteHeader{height:78px}.brandMark{width:48px;height:48px}.brandMark svg{width:34px;height:34px}.brandName{font-size:22px}.brandSlogan{font-size:6px}.nav>a:not(.waTop),.navSearch{display:none}.waTop{padding:12px}.waTop svg{width:20px}.hero{height:540px}.heroCopy h1{font-size:43px}.heroCopy p{font-size:16px}.benefitsGrid{grid-template-columns:1fr;gap:0;padding-block:12px}.benefit{padding:12px 0}.dealGrid{grid-template-columns:1fr}.modal{padding:0}.modalBox{border-radius:0}.gallery{padding:65px 12px 12px}.mainPhoto{height:340px}.modalInfo{padding:28px 20px}.floatingWa{width:56px;height:56px;right:16px;bottom:16px}}
+/* v5 — simplified navigation + institutional contact */
+.nav{gap:52px}
+.navSearch,.waTop{display:none!important}
+.contact{padding:0;background:#090c0d;border-top:1px solid #252a2c;border-bottom:1px solid #252a2c}
+.contactPanel{min-height:285px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:90px;padding-top:46px;padding-bottom:46px}
+.contactIntro{padding-right:40px}
+.eyebrow{display:block;color:var(--orange);font-size:11px;letter-spacing:2.6px;font-weight:900;margin-bottom:13px}
+.contactIntro h2{font-size:37px;line-height:1.03;letter-spacing:-1.4px;margin:0 0 16px;font-weight:900}
+.contactIntro h2 span{color:var(--orange)}
+.contactIntro p{max-width:520px;color:#aeb4b6;font-size:14px;line-height:1.65;margin:0}
+.contactDetails{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #2d3335;border-radius:12px;overflow:hidden;background:linear-gradient(145deg,#101415,#0a0d0e)}
+.contactItem{min-height:94px;padding:20px 23px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid #2d3335}
+.contactItem:nth-child(odd){border-right:1px solid #2d3335}
+.contactItem:nth-child(3){border-bottom:0}
+.contactLabel{font-size:9px;letter-spacing:1.6px;font-weight:800;color:#8f9698;margin-bottom:8px}
+.contactItem strong{font-size:15px;color:#f5f5f3}
+.contactWa{min-height:94px;display:flex;align-items:center;justify-content:center;gap:11px;background:#151a1b;border-bottom:0;color:#fff;font-size:12px;font-weight:850;letter-spacing:.2px}
+.contactWa:hover{background:#1b2223}
+.contactWa svg{width:27px;height:27px;fill:none;stroke:#25d366;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:900px){
+  .contactPanel{grid-template-columns:1fr;gap:30px}
+  .contactIntro{padding-right:0}
+}
+@media(max-width:720px){
+  .nav{gap:22px}
+  .nav>a:not(.waTop){display:block!important;padding:29px 0 24px;font-size:13px}
+  .nav>a.active:after{bottom:17px}
+  .brandSlogan{display:none}
+  .contactPanel{padding-top:38px;padding-bottom:38px}
+  .contactIntro h2{font-size:31px}
+  .contactDetails{grid-template-columns:1fr}
+  .contactItem:nth-child(odd){border-right:0}
+  .contactItem:nth-child(3){border-bottom:1px solid #2d3335}
+}
