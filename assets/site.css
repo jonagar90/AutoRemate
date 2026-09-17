@@ -43,3 +43,14 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
   .contactItem:nth-child(odd){border-right:0}
   .contactItem:nth-child(3){border-bottom:1px solid #2d3335}
 }
+
+/* v6 — contact correction: no table, no duplicate website/WhatsApp CTA */
+.contactPanelSimple{grid-template-columns:1fr 1.15fr;gap:110px}
+.contactLinks{display:flex;align-items:center;justify-content:flex-start;gap:58px;flex-wrap:wrap}
+.simpleContact{display:flex;align-items:center;gap:13px;color:#f5f5f3;font-size:15px;white-space:nowrap}
+.simpleContact b{font-weight:800}
+.simpleIcon{width:42px;height:42px;border-radius:10px;border:1px solid rgba(255,101,31,.35);display:grid;place-items:center;background:rgba(255,101,31,.04)}
+.simpleIcon svg{width:21px;height:21px;fill:none;stroke:var(--orange);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.contactDetails,.contactWa{display:none!important}
+@media(max-width:1050px){.contactPanelSimple{grid-template-columns:1fr;gap:30px}.contactLinks{gap:28px 45px}}
+@media(max-width:720px){.contactLinks{display:grid;gap:18px}.simpleContact{white-space:normal;font-size:14px}}
