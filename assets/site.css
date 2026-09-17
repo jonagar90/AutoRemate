@@ -63,3 +63,36 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
   .brandOfficial{height:54px;max-width:230px}
   .brandOfficial img{height:45px;max-width:230px}
 }
+
+/* v9 — approved header polish only */
+.siteHeader{height:104px}
+.brandOfficial{height:82px}
+.brandOfficial img{
+  height:78px;
+  width:auto;
+  max-width:540px;
+  object-fit:contain;
+  object-position:left center;
+}
+.floatingWa{
+  width:68px;
+  height:68px;
+  right:28px;
+  bottom:28px;
+  background:#25D366;
+  border:0;
+  box-shadow:0 10px 34px rgba(37,211,102,.38);
+}
+.floatingWa img{
+  width:39px;
+  height:39px;
+  display:block;
+}
+.floatingWa svg{display:none!important}
+@media(max-width:720px){
+  .siteHeader{height:82px}
+  .brandOfficial{height:62px;max-width:270px}
+  .brandOfficial img{height:58px;max-width:270px}
+  .floatingWa{width:60px;height:60px;right:17px;bottom:17px}
+  .floatingWa img{width:34px;height:34px}
+}
