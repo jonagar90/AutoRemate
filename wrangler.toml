@@ -15,6 +15,7 @@ r2_buckets = [
 
 [vars]
 ALLOWED_ORIGIN = "https://autoremategt.com"
+# Redeploy configuration
 
 # Set the admin password as a secret (not in this file):
 # wrangler secret put ADMIN_PASSWORD
