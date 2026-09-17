@@ -1,13 +1,22 @@
 const API='https://autoremate-api.jonagar90.workers.dev',WA='50233584071';let cars=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const image=k=>!k?'':k.startsWith('http')?k:`${API}/${k.replace(/^\/+/,'')}`;
+const retryVehicleImage=img=>{
+ if(!img||img.dataset.retryDone)return;
+ img.dataset.retryDone='1';
+ try{
+   const raw=img.getAttribute('src')||'';
+   const path=new URL(raw,location.href).pathname.replace(/^\/+/, '');
+   if(path&&!path.startsWith('cars/'))img.src=`${API}/cars/${path.replace(/^images\//,'')}`;
+ }catch(e){}
+};
 const money=n=>Number(n)>0?'Q '+Number(n).toLocaleString('en-US'):'';
 const title=c=>c.title||[c.year,c.make,c.model,c.trim].filter(Boolean).join(' ')||'Deal AutoRemate';
 const active=c=>c.status!=='vendido'&&c.type!=='vendido';
 const status=c=>c.status==='disponible'?'DISPONIBLE':'EN TRÁNSITO';
 const fmtDate=s=>{if(!s)return'';const d=new Date(s+'T12:00:00');return isNaN(d)?s:d.toLocaleDateString('es-GT',{day:'numeric',month:'long',year:'numeric'})};
 const icon=(n)=>`<span class="miniIcon">${n}</span>`;
-function card(c,sold=false){const im=(c.images||[])[0];const meta=[c.trim,c.fuel,c.transmission,c.mileage?Number(c.mileage).toLocaleString()+' millas':''].filter(Boolean).join(' · ');return `<article class="dealCard" onclick="openDeal('${esc(c.id)}')"><div class="dealImage">${im?`<img src="${esc(image(im))}" alt="${esc(title(c))}" loading="lazy">`:''}<span class="dealBadge ${sold?'sold':c.status==='disponible'?'available':''}">${sold?'VENDIDO':esc(status(c))}</span></div><div class="dealBody"><h3>${esc(title(c).toUpperCase())}</h3><div class="dealMeta">${esc(meta)}</div>${!sold&&money(c.price)?`<div class="dealPrice">${esc(money(c.price))}</div>`:''}</div></article>`}
+function card(c,sold=false){const im=(c.images||[])[0];const meta=[c.trim,c.fuel,c.transmission,c.mileage?Number(c.mileage).toLocaleString()+' millas':''].filter(Boolean).join(' · ');return `<article class="dealCard" onclick="openDeal('${esc(c.id)}')"><div class="dealImage">${im?`<img src="${esc(image(im))}" alt="${esc(title(c))}" loading="lazy" onerror="retryVehicleImage(this)">`:''}<span class="dealBadge ${sold?'sold':c.status==='disponible'?'available':''}">${sold?'VENDIDO':esc(status(c))}</span></div><div class="dealBody"><h3>${esc(title(c).toUpperCase())}</h3><div class="dealMeta">${esc(meta)}</div>${!sold&&money(c.price)?`<div class="dealPrice">${esc(money(c.price))}</div>`:''}</div></article>`}
 async function load(){try{const r=await fetch(API+'/api/cars');if(!r.ok)throw Error();const d=await r.json();cars=Array.isArray(d)?d:Array.isArray(d.cars)?d.cars:[];render();openFromUrl()}catch(e){document.querySelectorAll('[data-cars]').forEach(x=>x.innerHTML='<div class="empty">No pudimos cargar los Deals.</div>')}}
 function render(){const a=cars.filter(active),s=cars.filter(c=>!active(c));document.querySelector('[data-cars="active"]').innerHTML=a.map(c=>card(c)).join('')||'<div class="empty">No hay Deals disponibles.</div>';document.querySelector('[data-cars="sold"]').innerHTML=s.map(c=>card(c,true)).join('')||'<div class="empty">Todavía no hay Deals vendidos.</div>'}
 function specRows(c){return [['Año',c.year],['Marca',c.make],['Modelo',[c.model,c.trim].filter(Boolean).join(' ')],['Motor',c.engine],['Combustible',c.fuel],['Transmisión',c.transmission],['Tracción',c.drivetrain],['Kilometraje',c.mileage?Number(c.mileage).toLocaleString()+' millas':''],['Color',c.color],['Título',c.titleType]].filter(x=>x[1]).map(([a,b])=>`<div class="specRow"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}
@@ -37,7 +46,7 @@ const details=[['Llegada estimada',fmtDate(c.arrival)],['Condición',c.damage],[
 const candidates=cars.filter(x=>active(x)&&String(x.id)!==String(c.id));
 const score=x=>(x.make&&c.make&&x.make.toLowerCase()===c.make.toLowerCase()?5:0)+(x.model&&c.model&&x.model.toLowerCase()===c.model.toLowerCase()?6:0)+(x.year&&c.year?Math.max(0,3-Math.abs(Number(x.year)-Number(c.year))):0)+(x.price&&c.price&&Math.abs(Number(x.price)-Number(c.price))/Math.max(Number(c.price),1)<.25?2:0);
 const other=candidates.map(x=>({x,s:score(x)})).filter(o=>o.s>0).sort((a,b)=>b.s-a.s).slice(0,4).map(o=>o.x);
-window.currentDealImages=ims.map(image);window.currentDealPhotoIndex=0;const thumbs=ims.map((x,i)=>`<button class="detailThumb ${i===0?'selected':''}" onclick="goDealPhoto(${i},this)"><img src="${esc(image(x))}" alt=""></button>`).join('');
+window.currentDealImages=ims.map(image);window.currentDealPhotoIndex=0;const thumbs=ims.map((x,i)=>`<button class="detailThumb ${i===0?'selected':''}" onclick="goDealPhoto(${i},this)"><img src="${esc(image(x))}" alt="" onerror="retryVehicleImage(this)"></button>`).join('');
 const similar=other.length?`<section class="similarDeals"><div class="detailSectionHead"><h3>Vehículos similares</h3><button onclick="closeDeal(true)">Ver todos los deals →</button></div><div class="similarGrid">${other.map(x=>card(x,false)).join('')}</div></section>`:'';
 document.getElementById('modalContent').innerHTML=`
 <header class="detailHeader"><div class="detailShell detailHeaderInner"><a class="detailLogoLink" href="/" onclick="closeDeal(false)"><img src="assets/autoremate-header.png" class="detailLogo" alt="AutoRemate"></a><nav><a href="#" onclick="closeDeal(true);return false">Deals</a><a href="#vendidos" onclick="closeDeal(true)">Vendidos</a><a href="#contacto" onclick="closeDeal(true)">Contacto</a></nav></div></header>
@@ -47,7 +56,7 @@ document.getElementById('modalContent').innerHTML=`
 <section class="detailHero">
 <div class="detailGallery">
 <div class="detailMainPhoto" id="detailMainPhoto">
-${ims[0]?`<div id="dealPhotoBackdrop" class="dealPhotoBackdrop" style="background-image:url('${esc(image(ims[0]))}')"></div><img id="mainDealPhoto" src="${esc(image(ims[0]))}" alt="${esc(title(c))}">`:''}
+${ims[0]?`<div id="dealPhotoBackdrop" class="dealPhotoBackdrop" style="background-image:url('${esc(image(ims[0]))}')"></div><img id="mainDealPhoto" src="${esc(image(ims[0]))}" alt="${esc(title(c))}" onerror="retryVehicleImage(this)">`:''}
 ${ims.length>1?`<button class="photoNav photoPrev" onclick="cycleDealPhoto(-1)" aria-label="Foto anterior">‹</button><button class="photoNav photoNext" onclick="cycleDealPhoto(1)" aria-label="Foto siguiente">›</button>`:''}
 ${ims.length?`<button class="photoExpand" onclick="openPhotoViewer()" aria-label="Ampliar fotografía">↗</button>`:''}
 <span class="photoCount">▣ <b id="dealPhotoCount">1</b> / ${Math.max(ims.length,1)}</span></div>
