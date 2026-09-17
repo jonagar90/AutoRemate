@@ -97,18 +97,36 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
   .floatingWa img{width:34px;height:34px}
 }
 
-/* v10 — approved Hero visual only */
+/* v11 — approved clean hero + responsive behavior */
+.hero{
+  height:clamp(430px,31vw,590px);
+  min-height:430px;
+}
 .heroPhoto{
   background-image:
-    linear-gradient(90deg,rgba(3,5,6,.22) 0%,rgba(3,5,6,.06) 42%,rgba(3,5,6,0) 70%),
-    url("hero-approved.webp") !important;
-  background-position:center center !important;
+    linear-gradient(90deg,rgba(3,5,6,.52) 0%,rgba(3,5,6,.24) 31%,rgba(3,5,6,.04) 58%,rgba(3,5,6,0) 78%),
+    url("hero-approved-clean.webp") !important;
   background-size:cover !important;
+  background-position:58% center !important;
   background-repeat:no-repeat !important;
 }
-@media(max-width:900px){
-  .heroPhoto{background-position:58% center !important}
+.heroCopy{max-width:min(590px,43vw)}
+.heroCopy h1{font-size:clamp(42px,3.65vw,61px)}
+.heroCopy p{font-size:clamp(16px,1.25vw,20px)}
+.benefitAssetIcon{display:block;width:36px;height:36px;object-fit:contain}
+@media(max-width:1100px){
+  .hero{height:clamp(440px,46vw,540px)}
+  .heroPhoto{background-position:62% center !important}
+  .heroCopy{max-width:48vw}
 }
-@media(max-width:620px){
-  .heroPhoto{background-position:63% center !important}
+@media(max-width:760px){
+  .hero{height:560px}
+  .heroPhoto{
+    background-position:68% center !important;
+    background-image:
+      linear-gradient(90deg,rgba(3,5,6,.82) 0%,rgba(3,5,6,.48) 58%,rgba(3,5,6,.10) 100%),
+      url("hero-approved-clean.webp") !important;
+  }
+  .heroCopy{max-width:88%}
+  .heroCopy h1{font-size:clamp(39px,10vw,48px)}
 }
