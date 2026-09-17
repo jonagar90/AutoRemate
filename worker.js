@@ -16,7 +16,16 @@ if(/^\/api\/cars\/[^/]+$/.test(u.pathname)&&req.method==='PATCH'){if(!auth(req,e
 if(/^\/api\/cars\/[^/]+\/sell$/.test(u.pathname)&&req.method==='POST'){if(!auth(req,env))return json({error:'No autorizado'},401,H);const id=decodeURIComponent(u.pathname.split('/')[3]),cars=await getCars(env),i=cars.findIndex(x=>String(x.id)===id);if(i<0)return json({error:'No encontrado'},404,H);cars[i]=mergeCar(cars[i],{status:'vendido',type:'vendido'});await putCars(env,cars);return json({ok:true,car:cars[i]},200,H)}
 if(/^\/api\/cars\/[^/]+$/.test(u.pathname)&&req.method==='DELETE'){if(!auth(req,env))return json({error:'No autorizado'},401,H);const id=decodeURIComponent(u.pathname.split('/').pop()),cars=await getCars(env),next=cars.filter(x=>String(x.id)!==id);await putCars(env,next);return json({ok:true},200,H)}
 if(u.pathname==='/api/upload'&&req.method==='POST'){if(!auth(req,env))return json({error:'No autorizado'},401,H);const fd=await req.formData(),f=fd.get('file');if(!f||typeof f==='string')return json({error:'Archivo requerido'},400,H);if(!String(f.type||'').startsWith('image/'))return json({error:'Solo imágenes'},400,H);const ext=(f.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,'').toLowerCase();const key=`cars/${Date.now()}-${crypto.randomUUID()}.${ext}`;await env.IMAGES.put(key,await f.arrayBuffer(),{httpMetadata:{contentType:f.type||'image/jpeg'}});return json({ok:true,key},200,H)}
-if(u.pathname.startsWith('/cars/')&&req.method==='GET'){const o=await env.IMAGES.get(u.pathname.slice(1));if(!o)return new Response('Not found',{status:404,headers:H});const hd=new Headers(H);o.writeHttpMetadata(hd);hd.set('etag',o.httpEtag);hd.set('cache-control','public,max-age=31536000,immutable');return new Response(o.body,{headers:hd})}
+if(req.method==='GET'&&!u.pathname.startsWith('/api/')){
+ const requested=decodeURIComponent(u.pathname.replace(/^\/+/, ''));
+ const candidates=[requested];
+ if(requested&&!requested.startsWith('cars/'))candidates.push('cars/'+requested);
+ if(requested.startsWith('images/'))candidates.push(requested.slice(7));
+ if(requested.startsWith('cars/images/'))candidates.push(requested.slice(5));
+ let o=null;
+ for(const key of [...new Set(candidates.filter(Boolean))]){o=await env.IMAGES.get(key);if(o)break}
+ if(o){const hd=new Headers(H);o.writeHttpMetadata(hd);hd.set('etag',o.httpEtag);hd.set('cache-control','public,max-age=31536000,immutable');return new Response(o.body,{headers:hd})}
+}
 if(u.pathname==='/api/subscribe'&&req.method==='POST'){const b=await req.json(),email=String(b.email||'').trim().toLowerCase();if(!email.includes('@'))return json({error:'Correo inválido'},400,H);const raw=await env.CARS_KV.get('subscribers');let list=[];try{list=raw?JSON.parse(raw):[]}catch{}if(!list.includes(email)){list.push(email);await env.CARS_KV.put('subscribers',JSON.stringify(list))}return json({ok:true},200,H)}
 return new Response('Not found',{status:404,headers:H});
 }catch(e){return json({error:'Error interno',detail:String(e.message||e)},500,H)}
