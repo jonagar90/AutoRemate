@@ -5,10 +5,53 @@ const money=n=>Number(n)>0?'Q '+Number(n).toLocaleString('en-US'):'';
 const title=c=>c.title||[c.year,c.make,c.model,c.trim].filter(Boolean).join(' ')||'Deal AutoRemate';
 const active=c=>c.status!=='vendido'&&c.type!=='vendido';
 const status=c=>c.status==='disponible'?'DISPONIBLE':'EN TRÁNSITO';
+const fmtDate=s=>{if(!s)return'';const d=new Date(s+'T12:00:00');return isNaN(d)?s:d.toLocaleDateString('es-GT',{day:'numeric',month:'long',year:'numeric'})};
+const icon=(n)=>`<span class="miniIcon">${n}</span>`;
 function card(c,sold=false){const im=(c.images||[])[0];const meta=[c.trim,c.fuel,c.transmission,c.mileage?Number(c.mileage).toLocaleString()+' millas':''].filter(Boolean).join(' · ');return `<article class="dealCard" onclick="openDeal('${esc(c.id)}')"><div class="dealImage">${im?`<img src="${esc(image(im))}" alt="${esc(title(c))}" loading="lazy">`:''}<span class="dealBadge ${sold?'sold':c.status==='disponible'?'available':''}">${sold?'VENDIDO':esc(status(c))}</span></div><div class="dealBody"><h3>${esc(title(c).toUpperCase())}</h3><div class="dealMeta">${esc(meta)}</div>${!sold&&money(c.price)?`<div class="dealPrice">${esc(money(c.price))}</div>`:''}</div></article>`}
 async function load(){try{const r=await fetch(API+'/api/cars');if(!r.ok)throw Error();const d=await r.json();cars=Array.isArray(d)?d:Array.isArray(d.cars)?d.cars:[];render();openFromUrl()}catch(e){document.querySelectorAll('[data-cars]').forEach(x=>x.innerHTML='<div class="empty">No pudimos cargar los Deals.</div>')}}
 function render(){const a=cars.filter(active),s=cars.filter(c=>!active(c));document.querySelector('[data-cars="active"]').innerHTML=a.map(c=>card(c)).join('')||'<div class="empty">No hay Deals disponibles.</div>';document.querySelector('[data-cars="sold"]').innerHTML=s.map(c=>card(c,true)).join('')||'<div class="empty">Todavía no hay Deals vendidos.</div>'}
-function openDeal(id){const c=cars.find(x=>String(x.id)===String(id));if(!c)return;const ims=c.images||[];const facts=[['Estado',active(c)?status(c):'VENDIDO'],['Llegada estimada',c.arrival||''],['Stock',c.stock||''],['Millaje',c.mileage?Number(c.mileage).toLocaleString()+' millas':''],['Transmisión',c.transmission||''],['Combustible',c.fuel||''],['Tracción',c.drivetrain||''],['Color',c.color||''],['Tipo de título',c.titleType||''],['Condición / daño',c.damage||'']].filter(x=>x[1]);const u=`${location.origin}${location.pathname}?deal=${encodeURIComponent(c.id)}`;const wt=`Hola AutoRemate, me interesa el Deal: ${title(c)}. Link: ${u}`;const gallery=`<div class="gallery"><div class="mainPhoto">${ims[0]?`<img id="mainDealPhoto" src="${esc(image(ims[0]))}">`:''}</div><div class="thumbs">${ims.map((x,i)=>`<button class="thumb" onclick="document.getElementById('mainDealPhoto').src='${esc(image(x))}'"><img src="${esc(image(x))}"></button>`).join('')}</div></div>`;const info=`<div class="modalInfo"><div class="dealBadge" style="position:static;display:inline-block">${active(c)?status(c):'VENDIDO'}</div><h2>${esc(title(c))}</h2>${active(c)&&money(c.price)?`<div class="modalPrice">${esc(money(c.price))}</div>`:''}<div class="facts">${facts.map(([l,v])=>`<div class="fact"><span>${esc(l)}</span><strong>${esc(v)}</strong></div>`).join('')}</div>${active(c)?`<a class="waContact" style="display:block;text-align:center;margin-top:25px" target="_blank" href="https://wa.me/${WA}?text=${encodeURIComponent(wt)}">WhatsApp · +502 3358 4071</a>`:''}</div>`;document.getElementById('modalContent').innerHTML=`<div class="modalGrid">${gallery}${info}</div>`;document.getElementById('dealModal').classList.add('open');document.body.style.overflow='hidden';history.pushState({},'',`${location.pathname}?deal=${encodeURIComponent(c.id)}`)}
-function closeDeal(){document.getElementById('dealModal').classList.remove('open');document.body.style.overflow='';history.pushState({},'',location.pathname)}
+function specRows(c){return [['Año',c.year],['Marca',c.make],['Modelo',[c.model,c.trim].filter(Boolean).join(' ')],['Transmisión',c.transmission],['Tracción',c.drivetrain],['Kilometraje',c.mileage?Number(c.mileage).toLocaleString()+' millas':''],['Color',c.color],['Título',c.titleType]].filter(x=>x[1]).map(([a,b])=>`<div class="specRow"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}
+function navDeal(id,dir){const list=cars.filter(active);let i=list.findIndex(c=>String(c.id)===String(id));if(i<0||list.length<2)return;openDeal(list[(i+dir+list.length)%list.length].id)}
+function changeDealPhoto(src,btn){const m=document.getElementById('mainDealPhoto');if(m)m.src=src;document.querySelectorAll('.detailThumb').forEach(x=>x.classList.remove('selected'));if(btn)btn.classList.add('selected')}
+function openDeal(id){const c=cars.find(x=>String(x.id)===String(id));if(!c)return;const ims=c.images||[];const isActive=active(c);const u=`${location.origin}${location.pathname}?deal=${encodeURIComponent(c.id)}`;const wt=`Hola AutoRemate, me interesa el Deal: ${title(c)}. Link: ${u}`;const available=c.status==='disponible';
+const quick=[['⛽',c.fuel],['⚙',c.transmission],['◉',c.drivetrain],['⌁',c.mileage?Number(c.mileage).toLocaleString()+' millas':'']].filter(x=>x[1]);
+const details=[['Llegada estimada',fmtDate(c.arrival)],['Condición',c.damage],['Stock',c.stock],['Título',c.titleType]].filter(x=>x[1]);
+const other=cars.filter(x=>active(x)&&String(x.id)!==String(c.id)).slice(0,4);
+const thumbs=ims.map((x,i)=>`<button class="detailThumb ${i===0?'selected':''}" onclick="changeDealPhoto('${esc(image(x))}',this)"><img src="${esc(image(x))}" alt=""></button>`).join('');
+const similar=other.length?`<section class="similarDeals"><div class="detailSectionHead"><h3>Vehículos similares</h3><button onclick="closeDeal(true)">Ver todos los deals →</button></div><div class="similarGrid">${other.map(x=>card(x,false)).join('')}</div></section>`:'';
+document.getElementById('modalContent').innerHTML=`
+<header class="detailHeader"><div class="detailShell detailHeaderInner"><img src="assets/autoremate-header.png" class="detailLogo" alt="AutoRemate"><nav><a href="#" onclick="closeDeal(true);return false">Deals</a><a href="#vendidos" onclick="closeDeal(true)">Vendidos</a><a href="#contacto" onclick="closeDeal(true)">Contacto</a></nav></div></header>
+<main class="detailMain">
+<div class="detailShell">
+<div class="detailToolbar"><button onclick="closeDeal(true)">← Volver a todos los deals</button><div>${cars.filter(active).length>1?`<button onclick="navDeal('${esc(c.id)}',-1)">← Deal anterior</button><span></span><button onclick="navDeal('${esc(c.id)}',1)">Siguiente deal →</button>`:''}</div></div>
+<section class="detailHero">
+<div class="detailGallery">
+<div class="detailMainPhoto">${ims[0]?`<img id="mainDealPhoto" src="${esc(image(ims[0]))}" alt="${esc(title(c))}">`:''}<span class="photoCount">▣ 1 / ${Math.max(ims.length,1)}</span></div>
+<div class="detailThumbs">${thumbs}</div>
+</div>
+<div class="detailInfo">
+<div class="detailBadges">${isActive?`<span class="orangeBadge">DEAL ${available?'DISPONIBLE':'ACTIVO'}</span><span class="darkBadge">${esc(status(c))}</span>`:`<span class="darkBadge">VENDIDO</span>`}</div>
+<h1>${esc(title(c).toUpperCase())}</h1>${c.trim?`<div class="detailTrim">${esc(c.trim.toUpperCase())}</div>`:''}
+${quick.length?`<div class="quickSpecs">${quick.map(([i,v])=>`<span><b>${i}</b>${esc(v)}</span>`).join('')}</div>`:''}
+${isActive&&money(c.price)?`<div class="detailPrice">${esc(money(c.price))}</div>`:''}
+<div class="detailFacts">${details.map(([l,v])=>`<div><span>${esc(l)}:</span><strong>${esc(v)}</strong></div>`).join('')}</div>
+${isActive?`<a class="detailWa" target="_blank" rel="noopener" href="https://wa.me/${WA}?text=${encodeURIComponent(wt)}"><img src="assets/whatsapp.svg" alt="">Consultar por WhatsApp <b>›</b></a>`:''}
+<p class="detailDisclosure">Las fotografías muestran la condición real del vehículo.<br>Escríbenos para recibir todos los detalles de este deal.</p>
+</div></section>
+<section class="detailTrust">
+<div><svg><use href="#i-tag"/></svg><b>PRECIOS DE<br>OPORTUNIDAD</b></div>
+<div><svg><use href="#i-camera"/></svg><b>FOTOS<br>REALES</b></div>
+<div><svg><use href="#i-shield"/></svg><b>INFORMACIÓN<br>CLARA</b></div>
+<div><img src="assets/experience-handshake.svg" alt=""><b>+20 AÑOS DE<br>EXPERIENCIA</b></div>
+</section>
+<section class="detailColumns">
+<div><h3>Especificaciones</h3>${specRows(c)||'<p class="muted">Información por confirmar.</p>'}</div>
+<div><h3>Condición del vehículo</h3><p>${c.damage?`Condición reportada: <strong>${esc(c.damage)}</strong>.`: 'Consulta con AutoRemate para conocer la condición reportada del vehículo.'}</p><div class="importantNote"><b>ⓘ &nbsp; Notas importantes</b><p>La información mostrada corresponde a los datos disponibles del vehículo. Recomendamos revisar todos los detalles antes de tomar una decisión.</p></div></div>
+<div><h3>Información del Deal</h3>${details.map(([l,v])=>`<div class="infoLine"><span>✓</span>${esc(l)}: <strong>${esc(v)}</strong></div>`).join('')||'<p class="muted">Consulta los detalles directamente con AutoRemate.</p>'}</div>
+</section>
+${similar}
+</div></main>`;
+const modal=document.getElementById('dealModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';history.pushState({},'',`${location.pathname}?deal=${encodeURIComponent(c.id)}`);modal.scrollTop=0}
+function closeDeal(scroll=false){const m=document.getElementById('dealModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.style.overflow='';history.pushState({},'',location.pathname);if(scroll)setTimeout(()=>document.getElementById('deals')?.scrollIntoView({behavior:'smooth'}),50)}
 function openFromUrl(){const id=new URLSearchParams(location.search).get('deal');if(id)openDeal(id)}
-document.addEventListener('DOMContentLoaded',()=>{load();document.getElementById('closeModal').onclick=closeDeal;document.getElementById('dealModal').onclick=e=>{if(e.target.id==='dealModal')closeDeal()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDeal()})});
+document.addEventListener('DOMContentLoaded',()=>{load();document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('dealModal').classList.contains('open'))closeDeal()})});
