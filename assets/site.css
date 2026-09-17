@@ -173,3 +173,10 @@ footer{padding:30px 0;color:#929899;font-size:10px;letter-spacing:1.4px}.footerI
 .similarDeals{margin-top:36px;padding-top:25px;border-top:1px solid #252b2d}.detailSectionHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.detailSectionHead button{background:none;border:0;color:#d8dbdc;cursor:pointer}.similarGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.similarGrid .dealCard{width:auto}
 @media(max-width:1050px){.detailHero{grid-template-columns:1fr}.detailMainPhoto{height:500px}.detailInfo{max-width:760px}.detailColumns{grid-template-columns:1fr}.detailColumns>div{padding:24px 0;border-right:0;border-bottom:1px solid #2d3335}.detailTrust{grid-template-columns:repeat(2,1fr)}.detailTrust>div:nth-child(2){border-right:0}.detailTrust>div:nth-child(-n+2){border-bottom:1px solid #303638}.similarGrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.detailShell{width:min(100% - 28px,1460px)}.detailHeader{height:72px}.detailLogo{height:49px}.detailHeader nav{display:none}.detailToolbar>div{display:none}.detailMainPhoto{height:340px}.detailThumbs{grid-template-columns:repeat(4,1fr)}.detailThumb{height:68px}.detailInfo h1{font-size:28px}.detailPrice{font-size:38px}.detailTrust{grid-template-columns:1fr 1fr}.detailTrust>div{min-height:74px;padding:10px}.detailTrust svg,.detailTrust img{width:32px;height:32px}.similarGrid{grid-template-columns:1fr}.quickSpecs{gap:13px}.detailWa{font-size:16px}}
+
+/* v13 — complete data-driven Deal architecture */
+.detailThumbs{display:flex!important;overflow-x:auto;overflow-y:hidden;gap:10px;scrollbar-width:thin;padding-bottom:4px}
+.detailThumb{flex:0 0 112px!important;height:82px!important}
+.detailColumns .infoLine{display:flex;align-items:flex-start;gap:4px}
+.detailColumns .infoLine span{font-size:17px;font-weight:900}
+@media(max-width:700px){.detailThumb{flex-basis:88px!important;height:64px!important}}
