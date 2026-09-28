@@ -307,12 +307,17 @@ function closePhotoViewer(){
 function trackWhatsAppContact(id){
   const c=findDeal(id);
 
-  if(typeof fbq==='function'){
-    fbq('track','Contact',{
-      content_ids:[String(c?.stock||c?.id||id||'')],
-      content_name:c?title(c):'AutoRemate Deal',
-      content_type:'product'
-    });
+  console.log('AutoRemate META: WhatsApp click', {
+    id:id,
+    stock:c?.stock,
+    vehicle:c?title(c):null
+  });
+
+  if(typeof window.fbq === 'function'){
+    window.fbq('track','Contact');
+    console.log('AutoRemate META: Contact enviado');
+  }else{
+    console.warn('AutoRemate META: fbq no disponible');
   }
 }
 
