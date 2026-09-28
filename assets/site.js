@@ -316,6 +316,17 @@ function openDeal(id){
 
   if(!c)return;
 
+  /* META PIXEL: detalle de vehículo */
+  if(typeof fbq==='function'){
+    fbq('track','ViewContent',{
+      content_ids:[String(c.stock||c.id||'')],
+      content_name:title(c),
+      content_type:'product',
+      value:Number(c.price)||0,
+      currency:'GTQ'
+    });
+  }
+
   const ims=c.images||[];
 
   const isActive=active(c);
@@ -688,6 +699,7 @@ ${isActive?`
   target="_blank"
   rel="noopener"
   href="https://wa.me/${WA}?text=${encodeURIComponent(wt)}"
+  onclick="if(typeof fbq==='function')fbq('track','Contact',{content_name:title(c)})"
 >
 
 <img
