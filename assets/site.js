@@ -301,6 +301,23 @@ function closePhotoViewer(){
 
 
 /* =========================================================
+   META PIXEL: CONTACTO POR WHATSAPP
+   ========================================================= */
+
+function trackWhatsAppContact(id){
+  const c=findDeal(id);
+
+  if(typeof fbq==='function'){
+    fbq('track','Contact',{
+      content_ids:[String(c?.stock||c?.id||id||'')],
+      content_name:c?title(c):'AutoRemate Deal',
+      content_type:'product'
+    });
+  }
+}
+
+
+/* =========================================================
    ABRIR DEAL
    ========================================================= */
 
@@ -699,7 +716,7 @@ ${isActive?`
   target="_blank"
   rel="noopener"
   href="https://wa.me/${WA}?text=${encodeURIComponent(wt)}"
-  onclick="if(typeof fbq==='function')fbq('track','Contact',{content_name:title(c)})"
+  onclick="trackWhatsAppContact('${esc(c.id)}')"
 >
 
 <img
