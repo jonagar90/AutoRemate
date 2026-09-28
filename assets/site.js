@@ -45,7 +45,7 @@ function publicDealKey(c){
 
 function publicDealUrl(c){
   const key=publicDealKey(c);
-  return `${location.origin}/deal/${encodeURIComponent(key)}`;
+  return `${location.origin}/?deal=${encodeURIComponent(key)}`;
 }
 
 function findDeal(key){
@@ -855,7 +855,7 @@ ${similar}
   history.pushState(
     {},
     '',
-    `/deal/${encodeURIComponent(publicDealKey(c))}`
+    `/?deal=${encodeURIComponent(publicDealKey(c))}`
   );
 
 
@@ -903,48 +903,22 @@ function closeDeal(scroll=false){
 function openFromUrl(){
 
   /*
-    NUEVO FORMATO:
-
-    /deal/TX-3942
-  */
-
-  const match=location.pathname.match(
-    /^\/deal\/([^\/]+)\/?$/i
-  );
-
-  if(match){
-
-    const key=decodeURIComponent(match[1]);
-
-    const c=findDeal(key);
-
-    if(c){
-      openDeal(c.id);
-      return;
-    }
-  }
-
-
-  /*
-    COMPATIBILIDAD CON LINKS ANTERIORES:
+    FORMATO PÚBLICO:
 
     ?deal=TX-3942
 
-    o
-
-    ?deal=UUID
+    También acepta UUID antiguos.
   */
 
-  const oldKey=
+  const key=
     new URLSearchParams(location.search).get('deal');
 
-  if(oldKey){
+  if(!key)return;
 
-    const c=findDeal(oldKey);
+  const c=findDeal(key);
 
-    if(c){
-      openDeal(c.id);
-    }
+  if(c){
+    openDeal(c.id);
   }
 }
 
@@ -957,17 +931,8 @@ window.addEventListener('popstate',()=>{
 
   const modal=document.getElementById('dealModal');
 
-  const match=location.pathname.match(
-    /^\/deal\/([^\/]+)\/?$/i
-  );
-
-  const query=
-    new URLSearchParams(location.search).get('deal');
-
   const key=
-    match
-      ?decodeURIComponent(match[1])
-      :query;
+    new URLSearchParams(location.search).get('deal');
 
   if(key){
 
