@@ -1,5 +1,8 @@
 const API='https://autoremate-api.jonagar90.workers.dev',WA='50233584071';let cars=[];
 
+const SOLD_PAGE_SIZE=8;
+let soldPage=1;
+
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 const image=k=>!k?'':k.startsWith('http')?k:`${API}/${k.replace(/^\/+/,'')}`;
@@ -147,9 +150,101 @@ function render(){
     a.map(c=>card(c)).join('')||
     '<div class="empty">No hay Deals disponibles.</div>';
 
-  document.querySelector('[data-cars="sold"]').innerHTML=
-    s.map(c=>card(c,true)).join('')||
-    '<div class="empty">Todavía no hay Deals vendidos.</div>';
+  renderSoldPage(s);
+}
+
+
+/* =========================================================
+   PAGINACIÓN DE DEALS VENDIDOS
+   ========================================================= */
+
+function renderSoldPage(soldCars=cars.filter(c=>!active(c))){
+
+  const grid=document.querySelector('[data-cars="sold"]');
+
+  if(!grid)return;
+
+  if(!soldCars.length){
+    grid.innerHTML='<div class="empty">Todavía no hay Deals vendidos.</div>';
+    document.getElementById('soldPagination')?.remove();
+    return;
+  }
+
+  const totalPages=Math.max(1,Math.ceil(soldCars.length/SOLD_PAGE_SIZE));
+
+  soldPage=Math.min(Math.max(1,soldPage),totalPages);
+
+  const start=(soldPage-1)*SOLD_PAGE_SIZE;
+  const visible=soldCars.slice(start,start+SOLD_PAGE_SIZE);
+
+  grid.innerHTML=visible.map(c=>card(c,true)).join('');
+
+  renderSoldPagination(totalPages,grid);
+}
+
+
+function renderSoldPagination(totalPages,grid){
+
+  let nav=document.getElementById('soldPagination');
+
+  if(totalPages<=1){
+    nav?.remove();
+    return;
+  }
+
+  if(!nav){
+    nav=document.createElement('div');
+    nav.id='soldPagination';
+    nav.className='soldPagination';
+    grid.insertAdjacentElement('afterend',nav);
+  }
+
+  nav.innerHTML=`
+    <button
+      type="button"
+      onclick="changeSoldPage(-1)"
+      ${soldPage===1?'disabled':''}
+      style="border:1px solid #343a40;background:#111;color:#fff;border-radius:8px;padding:10px 16px;font-weight:700;cursor:${soldPage===1?'default':'pointer'};opacity:${soldPage===1?'.45':'1'}"
+    >← Anterior</button>
+
+    <span style="color:#fff;font-weight:700;white-space:nowrap">
+      Página ${soldPage} de ${totalPages}
+    </span>
+
+    <button
+      type="button"
+      onclick="changeSoldPage(1)"
+      ${soldPage===totalPages?'disabled':''}
+      style="border:1px solid #343a40;background:#111;color:#fff;border-radius:8px;padding:10px 16px;font-weight:700;cursor:${soldPage===totalPages?'default':'pointer'};opacity:${soldPage===totalPages?'.45':'1'}"
+    >Siguiente →</button>
+  `;
+
+  Object.assign(nav.style,{
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+    gap:'16px',
+    flexWrap:'wrap',
+    margin:'24px 0 0'
+  });
+}
+
+
+function changeSoldPage(dir){
+
+  const soldCars=cars.filter(c=>!active(c));
+  const totalPages=Math.max(1,Math.ceil(soldCars.length/SOLD_PAGE_SIZE));
+  const next=soldPage+dir;
+
+  if(next<1||next>totalPages)return;
+
+  soldPage=next;
+  renderSoldPage(soldCars);
+
+  document.getElementById('vendidos')?.scrollIntoView({
+    behavior:'smooth',
+    block:'start'
+  });
 }
 
 
