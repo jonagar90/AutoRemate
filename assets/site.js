@@ -988,6 +988,23 @@ ${similar}
   );
 
 
+  /* GOOGLE TAG MANAGER: VIEW DEAL */
+  window.dataLayer = window.dataLayer || [];
+
+  window.dataLayer.push({
+    event: 'view_deal',
+    deal_id: String(c.stock || c.id || ''),
+    vehicle_name: title(c),
+    vehicle_price: Number(c.price) || 0
+  });
+
+  console.log('AutoRemate GTM: view_deal', {
+    deal_id: String(c.stock || c.id || ''),
+    vehicle_name: title(c),
+    vehicle_price: Number(c.price) || 0
+  });
+
+
   modal.scrollTop=0;
 }
 
